@@ -6,11 +6,15 @@ export function filterBattles(
   battles: LiveBattle[],
   filter: BattleFilter,
   searchQuery: string,
-  now: number
+  now: number,
+  userName?: string
 ): LiveBattle[] {
   return battles.filter(battle => {
-    // Only show public battles in the feed
-    if (!battle.isPublic) return false;
+    // Hide private battles unless the user is a participant
+    if (!battle.isPublic) {
+      if (!userName) return false;
+      if (battle.p1.name !== userName && battle.p2.name !== userName) return false;
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -22,7 +26,6 @@ export function filterBattles(
       if (!matches) return false;
     }
 
-    // Status filter
     return matchesFilter(battle, filter, now);
   });
 }

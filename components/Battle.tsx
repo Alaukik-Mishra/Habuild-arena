@@ -298,7 +298,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
               <button onClick={() => alert('Shared!')} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold text-gray-600 uppercase tracking-widest border-2 border-gray-200 bg-gray-50 rounded-xl">
                 <Share2 className="w-5 h-5 mb-1 text-gray-500" /> Share
               </button>
-              <button onClick={resetGame} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
+              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
                 <Swords className="w-5 h-5 mb-1" /> Rematch
               </button>
             </div>
@@ -326,7 +326,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
               <button onClick={() => alert('Shared!')} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold text-gray-600 uppercase tracking-widest border-2 border-gray-200 bg-gray-50 rounded-xl">
                 <Share2 className="w-5 h-5 mb-1 text-gray-500" /> Share
               </button>
-              <button onClick={resetGame} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
+              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
                 <Swords className="w-5 h-5 mb-1" /> Rematch
               </button>
             </div>

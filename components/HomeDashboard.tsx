@@ -68,7 +68,7 @@ export default function HomeDashboard({
   const [selectedProfile, setSelectedProfile] = useState<PlayerStats | null>(null);
   const [pendingBet, setPendingBet] = useState<{ battleId: string; player: string } | null>(null);
 
-  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now)
+  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now, user.name)
     .filter(b => b.isPublic || b.p1.name === user.name || b.p2.name === user.name);
 
   const isParticipant = (b: LiveBattle) => b.p1.name === user.name || b.p2.name === user.name;

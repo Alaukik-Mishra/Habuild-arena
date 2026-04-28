@@ -196,9 +196,21 @@ export default function LiveBattlePage({
   };
 
   const confirmBet = () => {
-    if (!pendingBet || myBet || points < BET_AMOUNT) return;
+    if (!pendingBet || myBet || points < BET_AMOUNT || !battle) return;
     setPoints(p => p - BET_AMOUNT);
     setBets(prev => ({ ...prev, [battle.id]: pendingBet }));
+    setBetHistory(prev => [...prev, {
+      id: 'bet-' + Date.now(),
+      battleId: battle.id,
+      battleName: `${battle.p1.name} vs ${battle.p2.name} — ${battle.challenge}`,
+      challenge: battle.challenge,
+      playerBetOn: pendingBet,
+      opponent: pendingBet === battle.p1.name ? battle.p2.name : battle.p1.name,
+      amount: BET_AMOUNT,
+      winner: '',
+      status: 'lost' as const, // will be updated when battle resolves
+      timestamp: Date.now(),
+    }]);
     setPendingBet(null);
   };
 

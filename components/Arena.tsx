@@ -83,7 +83,7 @@ export function BattlesSection({
     setCommentText(prev => ({ ...prev, [battleId]: '' }));
   };
 
-  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now);
+  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now, user.name);
 
   const isParticipant = (battle: LiveBattle) =>
     battle.p1.name === user.name || battle.p2.name === user.name;

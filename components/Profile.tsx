@@ -88,12 +88,14 @@ export default function Profile({ user, betHistory, points, onLogout }: Props) {
           <div className="bg-primary/5 border-2 border-primary/10 rounded-2xl p-5">
             <div className="flex justify-between items-center mb-2">
               <span className="font-bold text-primary text-sm">Iron Will Milestone</span>
-              <span className="text-xs font-bold text-primary">60%</span>
+              <span className="text-xs font-bold text-primary">{Math.min(100, Math.round((user.wins / 10) * 100))}%</span>
             </div>
             <div className="w-full h-2 bg-primary/10 rounded-full overflow-hidden flex">
-              <div className="h-full bg-primary rounded-full transition-all w-[60%]" />
+              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((user.wins / 10) * 100))}%` }} />
             </div>
-            <p className="text-[10px] text-gray-500 font-medium mt-3">Win 6 more battles to unlock Elite Avatar frame.</p>
+            <p className="text-[10px] text-gray-500 font-medium mt-3">
+              {user.wins >= 10 ? 'Elite Avatar frame unlocked! 🏆' : `Win ${10 - user.wins} more battle${10 - user.wins === 1 ? '' : 's'} to unlock Elite Avatar frame.`}
+            </p>
           </div>
       </div>
 
