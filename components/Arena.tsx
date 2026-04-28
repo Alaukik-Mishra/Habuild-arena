@@ -447,13 +447,6 @@ function fmtTime(ts: number): string {
   return `${Math.floor(d / 86400)}d ago`;
 }
 
-// Default datetime-local value = now + 1 hour
-function defaultSchedule(): string {
-  const d = new Date(Date.now() + 3600000);
-  d.setSeconds(0, 0);
-  return d.toISOString().slice(0, 16);
-}
-
 export default function Arena({
   setScreen, setActiveBattleConfig, setActiveBattleId,
   invites, setInvites, friendRequests, setFriendRequests,
@@ -472,7 +465,16 @@ export default function Arena({
   const [selUser, setSelUser] = useState('');
   const [findQuery, setFindQuery] = useState('');
   const [isPublic, setIsPublic] = useState(true);
-  const [scheduleValue, setScheduleValue] = useState(defaultSchedule);
+  const [schedulePreset, setSchedulePreset] = useState<string | null>('now'); // 'now' | 'in1h' | 'in2h' | 'tomorrow' | null
+  const [customSchedule, setCustomSchedule] = useState('');
+  // Derived: the actual scheduled time string to use
+  const scheduleValue = (() => {
+    if (schedulePreset === 'now') { const d = new Date(); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'in1h') { const d = new Date(Date.now()+3600000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'in2h') { const d = new Date(Date.now()+7200000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'tomorrow') { const d = new Date(); d.setDate(d.getDate()+1); d.setHours(9,0,0,0); return d.toISOString().slice(0,16); }
+    return customSchedule;
+  })();
   const [activeChat, setActiveChat] = useState<string|null>(null);
   const [chatInput, setChatInput] = useState('');
   const [friendTab, setFriendTab] = useState<'received'|'sent'>('received');
@@ -706,52 +708,48 @@ export default function Arena({
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">When to Battle?</label>
             {/* Quick presets */}
             <div className="grid grid-cols-2 gap-2 mb-3">
-              {[
-                { label: '⚡ Right Now', offset: 0 },
-                { label: '⏰ In 1 Hour', offset: 3600000 },
-                { label: '🕑 In 2 Hours', offset: 7200000 },
-                { label: '🌅 Tomorrow 9am', offset: -1 },
-              ].map(({ label, offset }) => {
-                let targetVal: string;
-                if (offset === -1) {
-                  const tom = new Date();
-                  tom.setDate(tom.getDate() + 1);
-                  tom.setHours(9, 0, 0, 0);
-                  targetVal = tom.toISOString().slice(0, 16);
-                } else {
-                  const d = new Date(Date.now() + offset);
-                  d.setSeconds(0, 0);
-                  targetVal = d.toISOString().slice(0, 16);
-                }
-                const isSelected = scheduleValue === targetVal;
-                return (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => setScheduleValue(targetVal)}
-                    className={`py-3 px-3 rounded-xl text-xs font-bold border-2 transition-all text-left ${
-                      isSelected
-                        ? 'bg-blue-700 text-white border-blue-700 shadow-[0_3px_0_#1e3a8a]'
-                        : 'bg-white text-gray-600 border-gray-200 shadow-[0_3px_0_#e5e7eb] active:shadow-none active:translate-y-0.5'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
+              {([
+                { label: '⚡ Right Now', key: 'now' },
+                { label: '⏰ In 1 Hour', key: 'in1h' },
+                { label: '🕑 In 2 Hours', key: 'in2h' },
+                { label: '🌅 Tomorrow 9am', key: 'tomorrow' },
+              ] as const).map(({ label, key }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => { setSchedulePreset(key); setCustomSchedule(''); }}
+                  className={`py-3 px-3 rounded-xl text-xs font-bold border-2 transition-all text-left ${
+                    schedulePreset === key
+                      ? 'bg-blue-700 text-white border-blue-700 shadow-[0_3px_0_#1e3a8a]'
+                      : 'bg-white text-gray-600 border-gray-200 shadow-[0_3px_0_#e5e7eb] active:shadow-none active:translate-y-0.5'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
             {/* Custom picker */}
-            <div className="bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 flex items-center space-x-3">
+            <div className={`border-2 rounded-xl px-4 py-3 flex items-center space-x-3 transition-all ${schedulePreset !== null ? 'bg-gray-100 border-gray-100 opacity-50' : 'bg-gray-50 border-gray-200'}`}>
               <Clock className="w-4 h-4 text-gray-400 shrink-0" />
               <div className="flex-1">
                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Custom time</p>
                 <input
                   type="datetime-local"
-                  value={scheduleValue}
-                  onChange={e => setScheduleValue(e.target.value)}
-                  className="bg-transparent text-sm font-bold text-gray-900 outline-none w-full"
+                  value={customSchedule}
+                  disabled={schedulePreset !== null}
+                  onChange={e => { setCustomSchedule(e.target.value); setSchedulePreset(null); }}
+                  className="bg-transparent text-sm font-bold text-gray-900 outline-none w-full disabled:cursor-not-allowed"
                 />
               </div>
+              {schedulePreset !== null && (
+                <button
+                  type="button"
+                  onClick={() => setSchedulePreset(null)}
+                  className="text-[9px] font-bold text-blue-600 uppercase tracking-wider whitespace-nowrap"
+                >
+                  Use custom
+                </button>
+              )}
             </div>
             <p className="text-[10px] text-gray-400 mt-2 flex items-center">
               <span className="mr-1">📅</span>
