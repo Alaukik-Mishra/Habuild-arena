@@ -21,7 +21,7 @@ export async function getProfileByPhone(phone: string) {
     .select('*')
     .eq('phone', phone)
     .single();
-  if (error && error.code !== 'PGRST116') throw error;
+  if (error && error.code !== 'PGRST116') throw new Error(`DB error: ${error.message} (code: ${error.code})`);
   return data || null;
 }
 
@@ -37,8 +37,8 @@ export async function upsertProfile(profile: {
   stars?: number;
   referral_code?: string;
 }) {
-  const { error } = await supabase.from('profiles').upsert(profile, { onConflict: 'id' });
-  if (error) throw error;
+  const { error } = await supabase.from('profiles').upsert(profile, { onConflict: 'phone' });
+  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
 }
 
 export async function updateProfile(
