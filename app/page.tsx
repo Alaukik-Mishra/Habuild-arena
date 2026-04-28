@@ -446,7 +446,7 @@ export default function HabuildArena() {
           userName={user.name}
           onSendFriendRequest={async (name: string) => {
             if (friends.includes(name)) return;
-            const req: FriendRequest = { id: 'fr' + Date.now(), from: user.name, to: name, status: 'pending', timestamp: Date.now() };
+            const req: FriendRequest = { id: crypto.randomUUID(), from: user.name, to: name, status: 'pending', timestamp: Date.now() };
             setFriendRequests(prev => [...prev, req]);
             try { await createFriendRequest(req); } catch (e) { console.error(e); }
           }}
@@ -489,7 +489,7 @@ export default function HabuildArena() {
             try { await sendChatMessage(threadId, sender, text, timestamp); } catch (e) { console.error(e); }
           }}
           onCreateChatThread={async (participants: string[]) => {
-            try { return await createChatThread(participants); } catch (e) { console.error(e); return 't' + Date.now(); }
+            try { return await createChatThread(participants); } catch (e) { console.error(e); return crypto.randomUUID(); }
           }}
           user={user}
           points={points}

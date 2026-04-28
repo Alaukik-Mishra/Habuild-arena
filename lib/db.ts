@@ -20,8 +20,8 @@ export async function getProfileByPhone(phone: string) {
     .from('profiles')
     .select('*')
     .eq('phone', phone)
-    .single();
-  if (error && error.code !== 'PGRST116') throw new Error(`DB error: ${error.message} (code: ${error.code})`);
+    .maybeSingle();
+  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
   return data || null;
 }
 

@@ -521,7 +521,7 @@ export default function Arena({
     const target = CHALLENGE_TARGETS[challenge] || 10;
     const scheduledTime = new Date(scheduleValue).getTime() || Date.now() + 60000;
     const newInvite: Invite = {
-      id: 'i' + Date.now(),
+      id: crypto.randomUUID(),
       from: userName,
       to: opponent,
       challenge,
