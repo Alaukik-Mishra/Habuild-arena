@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://habuild-arena.vercel.app/$1",
+      "permanent": true,
+      "has": [
+        {
+          "type": "host",
+          "value": "habuild-arena-q69fisr1o-shlok-mishras-projects.vercel.app"
+        }
+      ]
+    }
+  ]
+}
