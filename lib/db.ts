@@ -37,8 +37,12 @@ export async function upsertProfile(profile: {
   stars?: number;
   referral_code?: string;
 }) {
-  const { error } = await supabase.from('profiles').upsert(profile, { onConflict: 'phone' });
-  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
+  // Try insert first; if phone already exists, fetch and return (no-op)
+  const { error } = await supabase.from('profiles').insert(profile);
+  if (error && error.code !== '23505') {
+    // 23505 = unique_violation (phone already exists), that's fine
+    throw new Error(`DB error: ${error.message} (code: ${error.code})`);
+  }
 }
 
 export async function updateProfile(
