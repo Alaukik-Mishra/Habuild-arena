@@ -37,12 +37,11 @@ export async function upsertProfile(profile: {
   stars?: number;
   referral_code?: string;
 }) {
-  // Try insert first; if phone already exists, fetch and return (no-op)
-  const { error } = await supabase.from('profiles').insert(profile);
-  if (error && error.code !== '23505') {
-    // 23505 = unique_violation (phone already exists), that's fine
-    throw new Error(`DB error: ${error.message} (code: ${error.code})`);
-  }
+  const { error } = await supabase.from('profiles').upsert(
+    { ...profile },
+    { onConflict: 'phone', ignoreDuplicates: false }
+  );
+  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
 }
 
 export async function updateProfile(
@@ -86,8 +85,7 @@ export async function getBattles(): Promise<LiveBattle[]> {
 }
 
 export async function createBattle(battle: Omit<LiveBattle, 'id'> & { id?: string }) {
-  const { error } = await supabase.from('battles').insert({
-    id: battle.id || undefined,
+  const { data, error } = await supabase.from('battles').insert({
     p1_name: battle.p1.name,
     p1_wins: battle.p1.wins,
     p1_streak: battle.p1.streak,
@@ -107,8 +105,9 @@ export async function createBattle(battle: Omit<LiveBattle, 'id'> & { id?: strin
     status: battle.status,
     is_public: battle.isPublic,
     betting_open: battle.bettingOpen,
-  });
-  if (error) throw error;
+  }).select('id').single();
+  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
+  return data.id as string;
 }
 
 export async function updateBattle(id: string, updates: Partial<LiveBattle> & { winner?: string; status?: string; bettingOpen?: boolean }) {
@@ -154,15 +153,16 @@ export async function getInvites(userName: string): Promise<Invite[]> {
 }
 
 export async function createInvite(invite: Omit<Invite, 'id' | 'timestamp'>) {
-  const { error } = await supabase.from('invites').insert({
+  const { data, error } = await supabase.from('invites').insert({
     from_name: invite.from,
     to_name: invite.to,
     challenge: invite.challenge,
     scheduled_time: invite.scheduledTime,
     status: invite.status,
     is_public: invite.isPublic,
-  });
-  if (error) throw error;
+  }).select('id').single();
+  if (error) throw new Error(`DB error: ${error.message} (code: ${error.code})`);
+  return data.id as string;
 }
 
 export async function updateInviteStatus(id: string, status: Invite['status']) {
