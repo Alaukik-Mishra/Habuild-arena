@@ -55,7 +55,16 @@ export function sortPostsByRecency(posts: CommunityPost[]): CommunityPost[] {
 export function calculatePollPercentages(voteCounts: number[]): number[] {
   const total = voteCounts.reduce((sum, count) => sum + count, 0);
   if (total === 0) return voteCounts.map(() => 0);
-  return voteCounts.map(count => Math.round((count / total) * 100));
+  // Use largest remainder method to ensure percentages sum to exactly 100
+  const raw = voteCounts.map(count => (count / total) * 100);
+  const floored = raw.map(Math.floor);
+  const remainder = 100 - floored.reduce((a, b) => a + b, 0);
+  const indices = raw
+    .map((v, i) => ({ i, r: v - Math.floor(v) }))
+    .sort((a, b) => b.r - a.r)
+    .slice(0, remainder)
+    .map(x => x.i);
+  return floored.map((v, i) => (indices.includes(i) ? v + 1 : v));
 }
 
 // ─── Delete Authorization ─────────────────────────────────────────────────────
@@ -69,6 +78,7 @@ export function canDeletePost(post: CommunityPost, currentUser: string): boolean
 export function formatRelativeTime(timestamp: number): string {
   const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
+  if (seconds < 5) return 'Just now';
   if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
