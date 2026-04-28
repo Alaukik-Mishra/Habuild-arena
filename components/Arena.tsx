@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Check, X, Send, Search, Globe, Lock, ArrowLeft, UserPlus, Clock, ChevronDown, Coins, Zap, MessageCircle, Link as LinkIcon, Crosshair, Flame, Trophy, RotateCcw } from 'lucide-react';
 import { AppScreen, Invite, FriendRequest, ChatThread, UserProfile, LiveBattle, PlayerStats } from '../types';
-import { subscribeToChat } from '../lib/db';
+import { subscribeToChat, updateInviteStatus, createBattle } from '../lib/db';
 import { filterBattles, BattleFilter } from '../lib/filters';
 
 // ─── BattlesSection ──────────────────────────────────────────────────────────
@@ -505,17 +505,41 @@ export default function Arena({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat, chatThreads]);
 
-  const handleAcceptInvite = (id: string) => {
+  const handleAcceptInvite = async (id: string) => {
     const inv = invites.find(i => i.id === id);
     if (!inv) return;
     setInvites(prev => prev.map(i => i.id === id ? { ...i, status: 'accepted' as const } : i));
+    // Create the battle now that opponent accepted
+    const target = CHALLENGE_TARGETS[inv.challenge] || 10;
+    const newBattle = {
+      id: inv.id,
+      p1: { name: inv.from, wins: 0, streak: 0 },
+      p2: { name: inv.to, wins: 0, streak: 0 },
+      challenge: inv.challenge,
+      pool: 0,
+      p1Reps: 0,
+      p2Reps: 0,
+      target,
+      timeLeft: '00:00',
+      comments: [] as import('../types').Comment[],
+      reactions: {} as import('../types').Reaction,
+      status: 'upcoming' as const,
+      isPublic: inv.isPublic,
+      bettingOpen: true,
+      scheduledTime: inv.scheduledTime,
+    };
+    setBattles(prev => [newBattle, ...prev]);
     setActiveBattleId(id);
-    setActiveBattleConfig({ opponent: inv.from, challenge: inv.challenge, target: CHALLENGE_TARGETS[inv.challenge] || 10, scheduledTime: inv.scheduledTime });
+    setActiveBattleConfig({ opponent: inv.from, challenge: inv.challenge, target, scheduledTime: inv.scheduledTime });
+    try { await updateInviteStatus(id, 'accepted'); } catch (e) { console.error(e); }
+    try { await createBattle(newBattle); } catch (e) { console.error(e); }
     setScreen('battle');
   };
 
-  const handleRejectInvite = (id: string) =>
+  const handleRejectInvite = async (id: string) => {
     setInvites(prev => prev.map(i => i.id === id ? { ...i, status: 'rejected' as const } : i));
+    try { await updateInviteStatus(id, 'rejected'); } catch (e) { console.error(e); }
+  };
 
   const handleCreate = () => {
     const challenge = customChallenge.trim() || selChallenge;
@@ -549,10 +573,8 @@ export default function Arena({
       timestamp: Date.now(),
     };
     onCreateInvite(newInvite);
-    setActiveBattleId(newInvite.id);
-    setActiveBattleConfig({ opponent, challenge, target, scheduledTime });
     setShowCreate(false);
-    setScreen('battle');
+    // Don't navigate to battle — wait for opponent to accept
   };
 
   const sendMsg = () => {
@@ -819,12 +841,13 @@ export default function Arena({
           <div className="space-y-6">
           {sentInvites.length > 0 && (() => {
             const WINDOW_MS = 3600000;
-            const filtered = sentInvites.filter(inv => {
+            const allSent = invites.filter(i => i.from === userName);
+            const filtered = allSent.filter(inv => {
               const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
               const isLive = !expired && Date.now() >= inv.scheduledTime;
-              if (challengeFilter === 'expired') return expired;
-              if (challengeFilter === 'live') return isLive;
-              if (challengeFilter === 'pending') return !expired && !isLive;
+              if (challengeFilter === 'expired') return expired || inv.status === 'rejected';
+              if (challengeFilter === 'live') return isLive && inv.status !== 'rejected';
+              if (challengeFilter === 'pending') return !expired && !isLive && inv.status === 'pending';
               return true;
             });
             if (filtered.length === 0) return null;
@@ -832,13 +855,15 @@ export default function Arena({
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Your Sent Challenges</h3>
               {filtered.map(inv => {
-                const WINDOW_MS = 3600000;
                 const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
+                const isRejected = inv.status === 'rejected';
+                const isAccepted = inv.status === 'accepted';
                 return (
                   <div
                     key={inv.id}
                     onClick={() => {
-                      if (expired) return;
+                      if (expired || isRejected) return;
+                      if (!isAccepted) return; // can't enter battle until accepted
                       setActiveBattleId(inv.id);
                       setActiveBattleConfig({
                         opponent: inv.to,
@@ -848,16 +873,25 @@ export default function Arena({
                       });
                       setScreen('battle');
                     }}
-                    className={`bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between ${expired ? 'opacity-50' : 'cursor-pointer active:scale-[0.98] transition-transform'}`}
+                    className={`bg-white border-2 rounded-2xl p-4 shadow-sm flex items-center justify-between ${
+                      isRejected ? 'border-red-100 opacity-80' : expired ? 'border-gray-100 opacity-50' : 'border-gray-100 cursor-pointer active:scale-[0.98] transition-transform'
+                    }`}
                   >
                     <div>
                       <h4 className="font-bold text-gray-900 text-base">vs {inv.to}</h4>
                       <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
                       <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                      {expired && <p className="text-[10px] text-red-400 font-bold mt-1">No one joined — expired</p>}
+                      {isRejected && <p className="text-[10px] text-red-500 font-bold mt-1">❌ Rejected by {inv.to}</p>}
+                      {expired && !isRejected && <p className="text-[10px] text-red-400 font-bold mt-1">No one joined — expired</p>}
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${expired ? 'text-gray-400 bg-gray-50 border-gray-200' : Date.now() >= inv.scheduledTime ? 'text-red-600 bg-red-50 border-red-100' : 'text-yellow-600 bg-yellow-50 border-yellow-100'}`}>
-                      {expired ? 'Expired' : Date.now() >= inv.scheduledTime ? '🔴 Live' : 'Pending'}
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${
+                      isRejected ? 'text-red-600 bg-red-50 border-red-200' :
+                      isAccepted ? 'text-green-600 bg-green-50 border-green-200' :
+                      expired ? 'text-gray-400 bg-gray-50 border-gray-200' :
+                      Date.now() >= inv.scheduledTime ? 'text-red-600 bg-red-50 border-red-100' :
+                      'text-yellow-600 bg-yellow-50 border-yellow-100'
+                    }`}>
+                      {isRejected ? 'Rejected' : isAccepted ? '✅ Accepted' : expired ? 'Expired' : Date.now() >= inv.scheduledTime ? '🔴 Live' : 'Pending'}
                     </span>
                   </div>
                 );

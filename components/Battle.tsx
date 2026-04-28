@@ -76,24 +76,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
     return () => clearInterval(id);
   }, [gameState]);
 
-  // Opponent AI
-  useEffect(() => {
-    if (gameState !== 'playing') return;
-    const id = setInterval(() => {
-      if (Math.random() > 0.65) {
-        setOpponentReps(prev => {
-          const next = prev + 1;
-          if (next >= targetReps && !hasEnded.current) {
-            hasEnded.current = true;
-            setGameState('loss');
-            onBattleEnd?.(activeBattleId);
-          }
-          return next;
-        });
-      }
-    }, 1200);
-    return () => clearInterval(id);
-  }, [gameState, targetReps, activeBattleId, onBattleEnd]);
+  // Opponent reps are updated only via real-time subscription (no AI auto-increment)
 
   const handleUserRep = () => {
     if (gameState !== 'playing') return;

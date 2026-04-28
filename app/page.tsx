@@ -405,26 +405,8 @@ export default function HabuildArena() {
           }}
           onCreateInvite={async (invite: Invite) => {
             setInvites(prev => [...prev, invite]);
-            const newBattle: Omit<LiveBattle, 'id'> & { id: string } = {
-              id: invite.id,
-              p1: { name: invite.from, wins: user.wins, streak: user.streak },
-              p2: { name: invite.to, wins: 0, streak: 0 },
-              challenge: invite.challenge,
-              pool: 0,
-              p1Reps: 0,
-              p2Reps: 0,
-              target: 10,
-              timeLeft: '00:00',
-              comments: [],
-              reactions: {},
-              status: 'upcoming',
-              isPublic: invite.isPublic,
-              bettingOpen: true,
-              scheduledTime: invite.scheduledTime,
-            };
-            setBattles(prev => [newBattle, ...prev]);
+            // Only persist the invite — battle is created only when opponent accepts
             try { await createInvite(invite); } catch (e) { console.error(e); }
-            try { await createBattle(newBattle); } catch (e) { console.error(e); }
           }}
           onSendMessage={async (threadId: string, sender: string, text: string, timestamp: number) => {
             try { await sendChatMessage(threadId, sender, text, timestamp); } catch (e) { console.error(e); }
