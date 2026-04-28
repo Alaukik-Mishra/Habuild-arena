@@ -31,7 +31,7 @@ const TARGETS = [50,120,100,60,100,1,20,1,1,75];
 
 function generateDummyBattles(): LiveBattle[] {
   const battles: LiveBattle[] = [];
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 2; i++) {
     const u1 = DUMMY_USERS[i % DUMMY_USERS.length];
     const u2 = DUMMY_USERS[(i + 3) % DUMMY_USERS.length];
     const challenge = DUMMY_CHALLENGES[i % DUMMY_CHALLENGES.length];
@@ -140,7 +140,7 @@ function AppShell({ children, hideNav = false, currentScreen, onNavigate }: Shel
   return (
     <div className="min-h-screen bg-[#E5E7EB] flex items-center justify-center p-4">
       <div className="w-full max-w-[412px] h-[844px] bg-[#FDFCF7] flex flex-col relative overflow-hidden">
-        <main className="flex-1 flex flex-col overflow-hidden relative">
+        <main className="flex-1 flex flex-col min-h-0 relative">
           {children}
         </main>
         {!hideNav && currentScreen && onNavigate && (
