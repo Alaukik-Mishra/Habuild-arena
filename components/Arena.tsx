@@ -803,7 +803,20 @@ export default function Arena({
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Your Sent Challenges</h3>
               {sentInvites.map(inv => (
-                <div key={inv.id} className="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div
+                  key={inv.id}
+                  onClick={() => {
+                    setActiveBattleId(inv.id);
+                    setActiveBattleConfig({
+                      opponent: inv.to,
+                      challenge: inv.challenge,
+                      target: CHALLENGE_TARGETS[inv.challenge] || 10,
+                      scheduledTime: inv.scheduledTime,
+                    });
+                    setScreen('battle');
+                  }}
+                  className="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+                >
                   <div>
                     <h4 className="font-bold text-gray-900 text-base">vs {inv.to}</h4>
                     <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
