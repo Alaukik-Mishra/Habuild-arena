@@ -57,10 +57,10 @@ export default function Leaderboard({ userName }: Props) {
       </div>
 
       <div className="bg-gray-100 p-1 rounded-xl flex mb-6 shadow-inner">
-        <button onClick={() => setSortBy('stars')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center space-x-1.5 ${sortBy === 'stars' ? 'bg-white shadow text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>
+        <button onClick={() => setSortBy('stars')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center space-x-1.5 ${sortBy === 'stars' ? 'bg-white shadow text-primary' : 'text-gray-500 hover:text-gray-700'}`}>
           <Star className="w-3.5 h-3.5" /><span>Stars</span>
         </button>
-        <button onClick={() => setSortBy('points')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center space-x-1.5 ${sortBy === 'points' ? 'bg-white shadow text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>
+        <button onClick={() => setSortBy('points')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center space-x-1.5 ${sortBy === 'points' ? 'bg-white shadow text-primary' : 'text-gray-500 hover:text-gray-700'}`}>
           <Trophy className="w-3.5 h-3.5" /><span>Points</span>
         </button>
       </div>
@@ -71,7 +71,7 @@ export default function Leaderboard({ userName }: Props) {
             key={entry.name}
             className={`flex items-center p-4 rounded-2xl border-2 transition-all ${
               entry.isUser
-                ? 'bg-orange-500/5 border-orange-500/20 shadow-sm'
+                ? 'bg-primary/5 border-primary/20 shadow-sm'
                 : 'bg-white border-gray-100'
             }`}
           >
@@ -91,7 +91,7 @@ export default function Leaderboard({ userName }: Props) {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2">
-                <span className={`font-bold text-sm truncate ${entry.isUser ? 'text-orange-500' : 'text-gray-900'}`}>
+                <span className={`font-bold text-sm truncate ${entry.isUser ? 'text-primary' : 'text-gray-900'}`}>
                   {entry.name} {entry.isUser && '(You)'}
                 </span>
               </div>

@@ -22,11 +22,11 @@ export default function BottomNav({ current, onNavigate }: Props) {
         <button
           key={screen}
           onClick={() => onNavigate(screen)}
-          className={`flex flex-col items-center transition-colors group ${current === screen ? 'text-orange-500' : 'text-gray-400 hover:text-gray-800'}`}
+          className={`flex flex-col items-center transition-colors group ${current === screen ? 'text-blue-700' : 'text-gray-400 hover:text-gray-800'}`}
         >
           <div className="relative">
             {current === screen && screen === 'arena' && (
-              <div className="absolute inset-0 bg-orange-500/20 blur-md rounded-full" />
+              <div className="absolute inset-0 bg-blue-700/20 blur-md rounded-full" />
             )}
             <Icon
               className={`w-6 h-6 mb-1 transition-transform relative z-10 ${current === screen ? 'scale-110' : 'group-hover:-translate-y-1'}`}

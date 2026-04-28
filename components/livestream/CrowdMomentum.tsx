@@ -17,7 +17,7 @@ export default function CrowdMomentum({ p1Name, p2Name, momentumScore }: CrowdMo
     <div className="w-full">
       <div className="text-center mb-2">
         {p1Dominant && (
-          <span className="text-xs font-black text-orange-500 uppercase tracking-widest animate-pulse">
+          <span className="text-xs font-black text-blue-700 uppercase tracking-widest animate-pulse">
             CROWD WITH {p1Name.toUpperCase()}
           </span>
         )}
@@ -34,7 +34,7 @@ export default function CrowdMomentum({ p1Name, p2Name, momentumScore }: CrowdMo
       </div>
       <div className="flex h-3 rounded-full overflow-hidden border-2 border-gray-200">
         <div
-          className={`bg-orange-500 transition-all duration-300 ${p1Dominant ? 'animate-pulse' : ''}`}
+          className={`bg-blue-500 transition-all duration-300 ${p1Dominant ? 'animate-pulse' : ''}`}
           style={{ width: `${p1Width}%` }}
         />
         <div

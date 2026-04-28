@@ -178,12 +178,12 @@ export function BattlesSection({
           >
             <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
               <div className="flex flex-col flex-1 mr-2">
-                <h4 className="font-serif text-lg font-bold text-orange-500 leading-tight">{battle.challenge}</h4>
+                <h4 className="font-serif text-lg font-bold text-blue-700 leading-tight">{battle.challenge}</h4>
                 <div className="flex flex-wrap items-center gap-1 mt-1">
                   {isCompleted ? (
                     <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 text-[10px] font-bold uppercase">Completed</span>
                   ) : isUpcoming ? (
-                    <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200 flex items-center text-[10px] font-bold uppercase">
+                    <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 flex items-center text-[10px] font-bold uppercase">
                       <Clock className="w-3 h-3 mr-1" />Upcoming
                     </span>
                   ) : (
@@ -210,13 +210,13 @@ export function BattlesSection({
 
             <div className="flex justify-between items-center mb-4">
               <div onClick={e => { e.stopPropagation(); setSelectedProfile(battle.p1); }} className="flex flex-col items-center flex-1 cursor-pointer">
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold mb-1 border-2 border-orange-400 shadow-sm">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold mb-1 border-2 border-blue-500 shadow-sm">
                   {battle.p1.name[0]}
                 </div>
                 <span className="text-[10px] font-bold text-gray-800">{battle.p1.name}</span>
                 <div className="text-[8px] text-gray-400 font-bold bg-gray-50 px-1.5 py-0.5 rounded mt-0.5">{battle.p1.wins}W • {battle.p1.streak}🔥</div>
                 <div className="w-16 bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div className="bg-orange-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
+                  <div className="bg-blue-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
                 </div>
                 <span className="text-[9px] text-gray-400 mt-0.5">{battle.p1Reps}/{battle.target}</span>
               </div>
@@ -254,7 +254,7 @@ export function BattlesSection({
               <div className="flex space-x-2" onClick={e => e.stopPropagation()}>
                 {bettingOpen && points >= 50 ? (
                   <>
-                    <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p1.name })} className="flex-1 py-3 bg-orange-50 text-orange-500 text-[11px] font-bold uppercase rounded-lg border-2 border-orange-200 active:bg-orange-100 transition-colors shadow-sm">
+                    <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p1.name })} className="flex-1 py-3 bg-blue-50 text-blue-700 text-[11px] font-bold uppercase rounded-lg border-2 border-blue-200 active:bg-blue-100 transition-colors shadow-sm">
                       Bet 50 on {battle.p1.name}
                     </button>
                     <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p2.name })} className="flex-1 py-3 bg-red-50 text-red-700 text-[11px] font-bold uppercase rounded-lg border-2 border-red-200 active:bg-red-100 transition-colors shadow-sm">
@@ -321,7 +321,7 @@ export function BattlesSection({
                 {battle.comments.length === 0 && <p className="text-center text-xs text-gray-300 mt-8">No comments yet. Be the first!</p>}
                 {battle.comments.map(c => (
                   <div key={c.id} className="bg-gray-50 rounded-xl p-3">
-                    <span className="font-bold text-orange-500 text-xs">{c.user}</span>
+                    <span className="font-bold text-blue-700 text-xs">{c.user}</span>
                     <p className="text-xs text-gray-600 mt-1">{c.text}</p>
                   </div>
                 ))}
@@ -333,9 +333,9 @@ export function BattlesSection({
                   onChange={e => setCommentText(prev => ({ ...prev, [battle.id]: e.target.value }))}
                   onKeyDown={e => e.key === 'Enter' && handleAddComment(battle.id)}
                   placeholder="Add a comment..."
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-orange-400"
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500"
                 />
-                <button onClick={() => handleAddComment(battle.id)} className="bg-orange-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
+                <button onClick={() => handleAddComment(battle.id)} className="bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
               </div>
             </div>
           </div>
@@ -378,7 +378,7 @@ export function BattlesSection({
           <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 relative z-10 shadow-2xl">
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-2">Confirm Bet</h3>
             <p className="text-sm text-gray-600 mb-2 leading-relaxed">
-              Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-orange-500">{pendingBet.player}</strong>?
+              Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-blue-700">{pendingBet.player}</strong>?
             </p>
             <p className="text-xs text-gray-400 mb-8">Result is paid out only after the battle ends.</p>
             <div className="flex space-x-3">
@@ -666,7 +666,7 @@ export default function Arena({
               value={customChallenge}
               onChange={e => setCustomChallenge(e.target.value)}
               placeholder="Or type your own challenge (e.g. 30 Pushups)..."
-              className="w-full mt-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-400"
+              className="w-full mt-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500"
             />
           </div>
 
@@ -694,7 +694,7 @@ export default function Arena({
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto">
                   {filteredUsers.map(u => (
                     <button key={u} onClick={() => { setFindQuery(u); setSelUser(''); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center space-x-2">
-                      <div className="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold text-xs">{u[0]}</div>
+                      <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-xs">{u[0]}</div>
                       <span>{u}</span>
                     </button>
                   ))}
@@ -710,10 +710,10 @@ export default function Arena({
           <div>
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Visibility</label>
             <div className="flex space-x-3">
-              <button onClick={() => setIsPublic(true)} className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 border-2 transition-all ${isPublic ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-500 border-gray-200'}`}>
+              <button onClick={() => setIsPublic(true)} className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 border-2 transition-all ${isPublic ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-gray-500 border-gray-200'}`}>
                 <Globe className="w-4 h-4" /><span>Public</span>
               </button>
-              <button onClick={() => setIsPublic(false)} className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 border-2 transition-all ${!isPublic ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-500 border-gray-200'}`}>
+              <button onClick={() => setIsPublic(false)} className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 border-2 transition-all ${!isPublic ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-gray-500 border-gray-200'}`}>
                 <Lock className="w-4 h-4" /><span>Private</span>
               </button>
             </div>
@@ -736,7 +736,7 @@ export default function Arena({
                   onClick={() => { setSchedulePreset(key); setCustomSchedule(''); }}
                   className={`py-3 px-3 rounded-xl text-xs font-bold border-2 transition-all text-left ${
                     schedulePreset === key
-                      ? 'bg-orange-500 text-white border-orange-500 shadow-[0_3px_0_#c2410c]'
+                      ? 'bg-blue-700 text-white border-blue-700 shadow-[0_3px_0_#1e3a8a]'
                       : 'bg-white text-gray-600 border-gray-200 shadow-[0_3px_0_#e5e7eb] active:shadow-none active:translate-y-0.5'
                   }`}
                 >
@@ -761,7 +761,7 @@ export default function Arena({
                 <button
                   type="button"
                   onClick={() => setSchedulePreset(null)}
-                  className="text-[9px] font-bold text-orange-500 uppercase tracking-wider whitespace-nowrap"
+                  className="text-[9px] font-bold text-blue-600 uppercase tracking-wider whitespace-nowrap"
                 >
                   Use custom
                 </button>
@@ -776,7 +776,7 @@ export default function Arena({
           <button
             onClick={handleCreate}
             disabled={(!selUser && !findQuery.trim()) || (!selChallenge && !customChallenge.trim())}
-            className="w-full bg-orange-500 text-white text-sm font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_4px_0_#c2410c] active:shadow-none active:translate-y-1 transition-all disabled:opacity-50 disabled:shadow-none"
+            className="w-full bg-blue-700 text-white text-sm font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_4px_0_#1e3a8a] active:shadow-none active:translate-y-1 transition-all disabled:opacity-50 disabled:shadow-none"
           >
             Create Challenge
           </button>
@@ -789,12 +789,12 @@ export default function Arena({
     <div className="flex-1 overflow-y-auto px-5 pt-8 pb-28 scrollbar-hide flex flex-col h-full bg-[#FDFCF7]">
       <div className="flex justify-between items-center mb-6 mt-2">
         <h2 className="text-3xl font-serif font-bold text-gray-900">The Arena</h2>
-        <button onClick={() => setShowCreate(true)} className="bg-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-[0_3px_0_#c2410c] active:shadow-none active:translate-y-1 transition-all">+ Create</button>
+        <button onClick={() => setShowCreate(true)} className="bg-blue-700 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-1 transition-all">+ Create</button>
       </div>
 
       <div className="bg-gray-100 p-1 rounded-xl flex mb-6 shadow-inner">
         {(['challenges', 'friends', 'chat'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all capitalize ${tab === t ? 'bg-white shadow text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>{t}</button>
+          <button key={t} onClick={() => setTab(t)} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all capitalize ${tab === t ? 'bg-white shadow text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}>{t}</button>
         ))}
       </div>
 
@@ -808,7 +808,7 @@ export default function Arena({
                 onClick={() => setChallengeFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border-2 transition-all flex-shrink-0 ${
                   challengeFilter === f
-                    ? 'bg-orange-500 text-white border-orange-500'
+                    ? 'bg-blue-700 text-white border-blue-700'
                     : 'bg-white text-gray-500 border-gray-200'
                 }`}
               >
@@ -852,7 +852,7 @@ export default function Arena({
                   >
                     <div>
                       <h4 className="font-bold text-gray-900 text-base">vs {inv.to}</h4>
-                      <p className="text-[11px] text-orange-500 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
+                      <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
                       <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                       {expired && <p className="text-[10px] text-red-400 font-bold mt-1">No one joined — expired</p>}
                     </div>
@@ -872,7 +872,7 @@ export default function Arena({
                 <div key={inv.id} className="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between">
                   <div>
                     <h4 className="font-bold text-gray-900 text-base">{inv.from}</h4>
-                    <p className="text-[11px] text-orange-500 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
+                    <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
                     <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                   <div className="flex space-x-3">
@@ -896,8 +896,8 @@ export default function Arena({
       {tab === 'friends' && (
         <div className="space-y-6">
           <div className="bg-gray-100 p-1 rounded-xl flex mb-2 shadow-inner">
-            <button onClick={() => setFriendTab('received')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${friendTab === 'received' ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>Received {recReqs.length > 0 && `(${recReqs.length})`}</button>
-            <button onClick={() => setFriendTab('sent')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${friendTab === 'sent' ? 'bg-white shadow text-orange-500' : 'text-gray-500'}`}>Sent</button>
+            <button onClick={() => setFriendTab('received')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${friendTab === 'received' ? 'bg-white shadow text-blue-700' : 'text-gray-500'}`}>Received {recReqs.length > 0 && `(${recReqs.length})`}</button>
+            <button onClick={() => setFriendTab('sent')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${friendTab === 'sent' ? 'bg-white shadow text-blue-700' : 'text-gray-500'}`}>Sent</button>
           </div>
           {friendTab === 'received' && (
             <div className="space-y-3">
@@ -952,7 +952,7 @@ export default function Arena({
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-bold mr-3">{u[0]}</div>
                     <h4 className="font-bold text-gray-900 text-sm">{u}</h4>
                   </div>
-                  <button onClick={() => onSendFriendRequest(u)} className="p-2 bg-orange-50 rounded-lg text-orange-500 active:bg-orange-100"><UserPlus className="w-4 h-4" /></button>
+                  <button onClick={() => onSendFriendRequest(u)} className="p-2 bg-blue-50 rounded-lg text-blue-700 active:bg-blue-100"><UserPlus className="w-4 h-4" /></button>
                 </div>
               ))}
             </div>

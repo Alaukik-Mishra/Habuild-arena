@@ -76,7 +76,7 @@ export default function CommentSheet({
           ) : (
             comments.map((comment) => (
               <div key={comment.id} className="space-y-0.5">
-                <span className="font-bold text-orange-500 text-sm">{comment.authorName}</span>
+                <span className="font-bold text-blue-700 text-sm">{comment.authorName}</span>
                 <p className="text-gray-800 text-sm leading-relaxed">{comment.text}</p>
               </div>
             ))
@@ -95,12 +95,12 @@ export default function CommentSheet({
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a comment..."
-              className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors"
+              className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors"
             />
             <button
               onClick={handleSubmit}
               disabled={!text.trim() || submitting}
-              className="bg-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-[0_3px_0_#c2410c] active:shadow-none active:translate-y-0.5 transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
+              className="bg-blue-700 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-0.5 transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
             >
               Post
             </button>
