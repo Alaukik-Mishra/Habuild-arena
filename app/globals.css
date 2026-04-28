@@ -5,6 +5,7 @@
   --color-primary-dark: #173eb1;
   --color-action: #4A6741;        /* Nature Green */
   --color-background: #FDFCF7;    /* Off-White */
+  --font-playfair: var(--font-playfair);
 }
 
 body {
@@ -15,7 +16,7 @@ body {
 }
 
 .font-serif {
-  font-family: 'Garamond', serif;
+  font-family: var(--font-playfair), 'Georgia', serif;
 }
 
 /* For mobile app feel on desktop */
