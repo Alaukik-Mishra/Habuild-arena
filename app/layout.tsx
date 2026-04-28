@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -22,7 +22,12 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Habuild Arena — Fitness Battle App",
   description: "Challenge friends to fitness battles, bet on outcomes, and build your tribe.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

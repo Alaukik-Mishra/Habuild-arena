@@ -17,7 +17,7 @@ import { resolveBet, BET_AMOUNT } from '@/lib/betLogic';
 import { updateStats } from '@/lib/statsLogic';
 import {
   getBattles, createBattle, updateBattle,
-  getInvites, createInvite, updateInviteStatus,
+  getInvites, createInvite,
   getFriendRequests, createFriendRequest, updateFriendRequestStatus,
   getChatThreads, createChatThread, sendChatMessage,
   getAllUsers, updateProfile,
