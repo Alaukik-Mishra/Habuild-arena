@@ -610,7 +610,7 @@ export default function Arena({
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <div className="shrink-0 p-3 border-t border-gray-200 bg-[#F0F0F0] flex items-center space-x-2">
+        <div className="shrink-0 sticky bottom-0 p-3 border-t border-gray-200 bg-[#F0F0F0] flex items-center space-x-2">
           <input
             type="text"
             value={chatInput}

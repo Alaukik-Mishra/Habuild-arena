@@ -17,7 +17,7 @@ export default function BottomNav({ current, onNavigate }: Props) {
   ];
 
   return (
-    <div className="shrink-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-100 px-4 py-3 flex justify-between items-start pt-4 rounded-b-[2.5rem] pb-[max(1rem,env(safe-area-inset-bottom))] z-20">
+    <div className="shrink-0 sticky bottom-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-between items-center z-20">
       {items.map(({ screen, icon: Icon, label }) => (
         <button
           key={screen}

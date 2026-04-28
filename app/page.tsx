@@ -80,7 +80,7 @@ type ShellProps = {
 function AppShell({ children, hideNav = false, currentScreen, onNavigate }: ShellProps) {
   return (
     <div className="min-h-screen bg-[#E5E7EB] md:flex md:items-center md:justify-center md:p-4">
-      <div className="w-full md:max-w-[412px] h-screen md:h-[844px] bg-[#FDFCF7] flex flex-col relative overflow-hidden md:rounded-[2rem] md:shadow-2xl">
+      <div className="w-full md:max-w-[412px] h-[100dvh] md:h-[844px] bg-[#FDFCF7] flex flex-col relative overflow-hidden md:rounded-[2rem] md:shadow-2xl">
         <main className="flex-1 flex flex-col min-h-0 relative">
           {children}
         </main>
