@@ -5,7 +5,7 @@
   --color-primary-dark: #173eb1;
   --color-action: #4A6741;
   --color-background: #FDFCF7;
-  --font-playfair: var(--font-playfair);
+  --font-bebas: var(--font-bebas);
   --font-sans: var(--font-inter), Helvetica, Arial, sans-serif;
 }
 
@@ -17,7 +17,8 @@ body {
 }
 
 .font-serif {
-  font-family: var(--font-playfair), 'Georgia', serif;
+  font-family: var(--font-bebas), 'Impact', sans-serif;
+  letter-spacing: 0.03em;
 }
 
 /* For mobile app feel on desktop */
