@@ -459,6 +459,7 @@ export default function Arena({
   selectedBattleId, setSelectedBattleId,
 }: Props) {
   const [tab, setTab] = useState<'challenges'|'chat'|'friends'>('challenges');
+  const [challengeFilter, setChallengeFilter] = useState<'all'|'live'|'pending'|'expired'>('all');
   const [showCreate, setShowCreate] = useState(false);
   const [selChallenge, setSelChallenge] = useState(challenges[0]);
   const [customChallenge, setCustomChallenge] = useState('');
@@ -581,7 +582,7 @@ export default function Arena({
   if (thread) {
     const other = thread.participants.find(p => p !== userName) || 'Friend';
     return (
-      <div className="flex-1 flex flex-col h-full bg-[#FDFCF7]">
+      <div className="flex-1 flex flex-col bg-[#FDFCF7] overflow-hidden">
         <div className="p-4 flex items-center border-b border-gray-100 bg-white/90 backdrop-blur-md sticky top-0 z-10">
           <button onClick={() => setActiveChat(null)} className="mr-3 text-gray-400 hover:text-gray-900"><ArrowLeft className="w-5 h-5" /></button>
           <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold mr-3 text-sm">{other[0]}</div>
@@ -609,7 +610,7 @@ export default function Arena({
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <div className="p-3 border-t border-gray-200 bg-[#F0F0F0] flex items-center space-x-2">
+        <div className="shrink-0 p-3 border-t border-gray-200 bg-[#F0F0F0] flex items-center space-x-2">
           <input
             type="text"
             value={chatInput}
@@ -620,7 +621,7 @@ export default function Arena({
           />
           <button
             onClick={sendMsg}
-            className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center active:scale-95 shadow-md"
+            className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center active:scale-95 shadow-md shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -798,12 +799,40 @@ export default function Arena({
       </div>
 
       {tab === 'challenges' && (
-        <div className="space-y-6">
-          {sentInvites.length > 0 && (
+        <div className="space-y-4">
+          {/* Filter bar */}
+          <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-1">
+            {(['all', 'live', 'pending', 'expired'] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setChallengeFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border-2 transition-all flex-shrink-0 ${
+                  challengeFilter === f
+                    ? 'bg-blue-700 text-white border-blue-700'
+                    : 'bg-white text-gray-500 border-gray-200'
+                }`}
+              >
+                {f === 'live' ? '🔴 Live' : f === 'pending' ? '⏳ Pending' : f === 'expired' ? '💀 Expired' : 'All'}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-6">
+          {sentInvites.length > 0 && (() => {
+            const WINDOW_MS = 3600000;
+            const filtered = sentInvites.filter(inv => {
+              const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
+              const isLive = !expired && Date.now() >= inv.scheduledTime;
+              if (challengeFilter === 'expired') return expired;
+              if (challengeFilter === 'live') return isLive;
+              if (challengeFilter === 'pending') return !expired && !isLive;
+              return true;
+            });
+            if (filtered.length === 0) return null;
+            return (
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Your Sent Challenges</h3>
-              {sentInvites.map(inv => {
-                const WINDOW_MS = 3600000; // 1 hour window
+              {filtered.map(inv => {
+                const WINDOW_MS = 3600000;
                 const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
                 return (
                   <div
@@ -827,14 +856,15 @@ export default function Arena({
                       <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                       {expired && <p className="text-[10px] text-red-400 font-bold mt-1">No one joined — expired</p>}
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${expired ? 'text-gray-400 bg-gray-50 border-gray-200' : 'text-yellow-600 bg-yellow-50 border-yellow-100'}`}>
-                      {expired ? 'Expired' : 'Pending'}
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${expired ? 'text-gray-400 bg-gray-50 border-gray-200' : Date.now() >= inv.scheduledTime ? 'text-red-600 bg-red-50 border-red-100' : 'text-yellow-600 bg-yellow-50 border-yellow-100'}`}>
+                      {expired ? 'Expired' : Date.now() >= inv.scheduledTime ? '🔴 Live' : 'Pending'}
                     </span>
                   </div>
                 );
               })}
             </div>
-          )}
+            );
+          })()}
           {pendingInvites.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Incoming Invites</h3>
@@ -859,6 +889,7 @@ export default function Arena({
               <p className="text-[10px] text-gray-300 mt-1">Create a challenge or wait for invites.</p>
             </div>
           )}
+          </div>
         </div>
       )}
 
