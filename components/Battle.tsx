@@ -31,11 +31,17 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
   const [opponentReps, setOpponentReps] = useState(0);
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME_SECONDS);
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const hasEnded = useRef(false);
+
+  // Keep nowMs updated so scheduled countdown is live
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const opponentName = config.opponent;
   const targetReps = config.target;
-  const nowMs = Date.now();
   const scheduledPassed = nowMs >= config.scheduledTime;
   const secondsLate = scheduledPassed ? Math.floor((nowMs - config.scheduledTime) / 1000) : 0;
   const isLate = scheduledPassed && secondsLate > GRACE_PERIOD_SECONDS && gameState === 'waiting';

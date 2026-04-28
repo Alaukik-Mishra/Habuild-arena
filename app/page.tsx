@@ -36,11 +36,8 @@ function generateDummyBattles(): LiveBattle[] {
     const u2 = DUMMY_USERS[(i + 3) % DUMMY_USERS.length];
     const challenge = DUMMY_CHALLENGES[i % DUMMY_CHALLENGES.length];
     const target = TARGETS[i % TARGETS.length];
-    const p1Reps = Math.floor(Math.random() * target * 0.8);
-    const p2Reps = Math.floor(Math.random() * target * 0.7);
-    const isLive = i < 5;
-    const isCompleted = i >= 10;
-    const winner = isCompleted ? (p1Reps >= target ? u1 : p2Reps >= target ? u2 : Math.random() > 0.5 ? u1 : u2) : undefined;
+    const p1Reps = Math.floor(Math.random() * target * 0.5);
+    const p2Reps = Math.floor(Math.random() * target * 0.4);
     battles.push({
       id: `db${i}`,
       p1: { name: u1, wins: Math.floor(Math.random()*50), streak: Math.floor(Math.random()*10) },
@@ -50,17 +47,13 @@ function generateDummyBattles(): LiveBattle[] {
       p1Reps,
       p2Reps,
       target,
-      timeLeft: isLive ? `0${Math.floor(Math.random()*5)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')}` : '00:00',
-      comments: i % 3 === 0 ? [{ id: `dc${i}`, user: DUMMY_USERS[(i+5)%DUMMY_USERS.length], text: `${u1} is crushing it!` }] : [],
-      reactions: {
-        fire: Array.from({ length: Math.floor(Math.random()*15) }, (_, j) => `User${j}`),
-        crown: Array.from({ length: Math.floor(Math.random()*8) }, (_, j) => `Viewer${j}`),
-      },
-      status: isLive ? 'live' : isCompleted ? 'completed' : 'upcoming',
+      timeLeft: `0${Math.floor(Math.random()*5)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')}`,
+      comments: [],
+      reactions: {},
+      status: 'live',
       isPublic: true,
-      bettingOpen: !isCompleted,
-      scheduledTime: isLive ? _now - Math.random()*600000 : isCompleted ? _now - 7200000 : _now + (i-4)*1800000,
-      winner,
+      bettingOpen: true,
+      scheduledTime: _now - Math.random()*600000,
     });
   }
   return battles;
@@ -68,14 +61,9 @@ function generateDummyBattles(): LiveBattle[] {
 
 const INITIAL_BATTLES = generateDummyBattles();
 
-const INITIAL_INVITES: Invite[] = [
-  { id: 'i1', from: 'Kunal', to: 'You', challenge: '1 Min Plank', scheduledTime: _now + 7200000, status: 'pending', isPublic: false, timestamp: _now - 120000 },
-];
+const INITIAL_INVITES: Invite[] = [];
 
-const INITIAL_FRIEND_REQUESTS: FriendRequest[] = [
-  { id: 'f1', from: 'Priya', to: 'You', status: 'pending', timestamp: _now - 3600000 },
-  { id: 'f2', from: 'You', to: 'Rahul', status: 'pending', timestamp: _now - 7200000 },
-];
+const INITIAL_FRIEND_REQUESTS: FriendRequest[] = [];
 
 const INITIAL_CHAT_THREADS: ChatThread[] = [
   {
@@ -272,7 +260,7 @@ export default function HabuildArena() {
       }
     }
     try {
-      await updateBattle(battleId, { winner: '', status: 'completed', bettingOpen: false });
+      await updateBattle(battleId, { winner: battles.find(b => b.id === battleId)?.winner || '', status: 'completed', bettingOpen: false });
     } catch (e) { console.error(e); }
   }, [battles, bets, user]);
 
