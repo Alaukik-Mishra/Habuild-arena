@@ -124,7 +124,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
               onClick={() => handleTabChange(tab.id)}
               className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
                 activeTab === tab.id
-                  ? 'bg-blue-700 border-blue-700 text-white shadow-[0_3px_0_#1e3a8a]'
+                  ? 'bg-orange-500 border-orange-500 text-white shadow-[0_3px_0_#c2410c]'
                   : 'bg-white border-gray-200 text-gray-500 shadow-[0_3px_0_#e5e7eb] active:shadow-none active:translate-y-0.5'
               }`}
             >
@@ -143,7 +143,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                 maxLength={500}
                 placeholder="Ask the community something..."
                 rows={5}
-                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-colors resize-none"
+                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-400 transition-colors resize-none"
               />
               <p className={`text-xs text-right font-medium ${questionText.length > 480 ? 'text-red-500' : 'text-gray-400'}`}>
                 {questionText.length}/500
@@ -158,7 +158,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                 value={pollQuestion}
                 onChange={(e) => setPollQuestion(e.target.value)}
                 placeholder="Poll question..."
-                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-400 transition-colors"
               />
               <div className="space-y-2">
                 {pollOptions.map((opt, i) => (
@@ -168,7 +168,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                       value={opt}
                       onChange={(e) => handleOptionChange(i, e.target.value)}
                       placeholder={`Option ${i + 1}`}
-                      className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors"
+                      className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors"
                     />
                     {pollOptions.length > 2 && (
                       <button
@@ -185,7 +185,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
               {pollOptions.length < 4 && (
                 <button
                   onClick={handleAddOption}
-                  className="text-sm font-bold text-blue-700 hover:text-blue-900 px-3 py-1.5 rounded-xl hover:bg-blue-50 transition-colors border-2 border-blue-100"
+                  className="text-sm font-bold text-orange-500 hover:text-blue-900 px-3 py-1.5 rounded-xl hover:bg-orange-50 transition-colors border-2 border-orange-100"
                 >
                   + Add Option
                 </button>
@@ -202,7 +202,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                   onClick={() => { setImageSource('url'); setImageUrl(''); }}
                   className={`flex-1 py-2 rounded-xl text-xs font-bold border-2 transition-all ${
                     imageSource === 'url'
-                      ? 'bg-blue-700 text-white border-blue-700'
+                      ? 'bg-orange-500 text-white border-orange-500'
                       : 'bg-white text-gray-500 border-gray-200'
                   }`}
                 >
@@ -213,7 +213,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                   onClick={() => { setImageSource('device'); setImageUrl(''); }}
                   className={`flex-1 py-2 rounded-xl text-xs font-bold border-2 transition-all ${
                     imageSource === 'device'
-                      ? 'bg-blue-700 text-white border-blue-700'
+                      ? 'bg-orange-500 text-white border-orange-500'
                       : 'bg-white text-gray-500 border-gray-200'
                   }`}
                 >
@@ -228,7 +228,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="Paste image URL..."
-                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-colors"
+                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-400 transition-colors"
                   />
                   {/* Live preview */}
                   {imageUrl.trim() && (
@@ -260,12 +260,12 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                 <div className="space-y-2">
                   <label className="block w-full cursor-pointer">
                     <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
-                      imageUrl ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-50 hover:border-blue-300 hover:bg-blue-50'
+                      imageUrl ? 'border-blue-300 bg-orange-50' : 'border-gray-300 bg-gray-50 hover:border-blue-300 hover:bg-orange-50'
                     }`}>
                       {imageUrl ? (
                         <div className="space-y-2">
                           <img src={imageUrl} alt="Preview" className="max-h-[180px] object-contain w-full rounded-lg" />
-                          <p className="text-xs text-blue-600 font-bold">Tap to change image</p>
+                          <p className="text-xs text-orange-500 font-bold">Tap to change image</p>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -300,7 +300,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
                   maxLength={280}
                   placeholder="Caption (optional)..."
                   rows={2}
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-colors resize-none"
+                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-400 transition-colors resize-none"
                 />
                 <p className={`text-xs text-right font-medium ${caption.length > 260 ? 'text-red-500' : 'text-gray-400'}`}>
                   {caption.length}/280
@@ -318,7 +318,7 @@ export default function FeedComposer({ currentUser, onClose, onSubmit }: FeedCom
           <button
             onClick={handlePost}
             disabled={submitting}
-            className="w-full bg-blue-700 text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-2xl shadow-[0_4px_0_#1e3a8a] active:shadow-none active:translate-y-1 transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
+            className="w-full bg-orange-500 text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-2xl shadow-[0_4px_0_#c2410c] active:shadow-none active:translate-y-1 transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
           >
             {submitting ? 'Posting…' : 'Post'}
           </button>

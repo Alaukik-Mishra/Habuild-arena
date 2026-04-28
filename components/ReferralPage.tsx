@@ -51,7 +51,7 @@ export default function ReferralPage({ user, setPoints }: Props) {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-[0_4px_0_#e5e7eb] flex flex-col items-center">
-          <Users className="w-6 h-6 text-blue-700 mb-2" />
+          <Users className="w-6 h-6 text-orange-500 mb-2" />
           <span className="text-2xl font-bold text-gray-900">{stats.count}</span>
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Friends Invited</span>
         </div>
@@ -71,7 +71,7 @@ export default function ReferralPage({ user, setPoints }: Props) {
           </div>
           <button
             onClick={handleCopy}
-            className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-blue-50 border-blue-200 text-blue-700 active:bg-blue-100'}`}
+            className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-orange-50 border-orange-200 text-orange-500 active:bg-orange-100'}`}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>

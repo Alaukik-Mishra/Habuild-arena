@@ -17,7 +17,7 @@ interface PostCardProps {
 }
 
 const POST_TYPE_BADGE: Record<CommunityPost['postType'], { label: string; className: string }> = {
-  question: { label: 'Question', className: 'bg-blue-50 text-blue-700 border-blue-100' },
+  question: { label: 'Question', className: 'bg-orange-50 text-orange-500 border-orange-100' },
   poll:     { label: 'Poll',     className: 'bg-purple-50 text-purple-700 border-purple-100' },
   meme:     { label: 'Meme',     className: 'bg-yellow-50 text-yellow-700 border-yellow-100' },
 };
@@ -56,7 +56,7 @@ export default function PostCard({
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center space-x-3">
           {/* Initials avatar */}
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
+          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-sm shrink-0">
             {getInitials(post.authorName)}
           </div>
           <div>

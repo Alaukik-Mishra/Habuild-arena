@@ -49,24 +49,24 @@ export default function PollOptions({
             key={i}
             className={`relative overflow-hidden rounded-xl border-2 px-4 py-3 ${
               isChosen
-                ? 'bg-blue-50 border-blue-400'
+                ? 'bg-orange-50 border-blue-400'
                 : 'bg-white border-gray-100'
             }`}
           >
             {/* Progress bar fill */}
             <div
               className={`absolute inset-y-0 left-0 rounded-xl transition-all duration-500 ${
-                isChosen ? 'bg-blue-100' : 'bg-gray-100'
+                isChosen ? 'bg-orange-100' : 'bg-gray-100'
               }`}
               style={{ width: `${pct}%` }}
             />
             {/* Content */}
             <div className="relative flex items-center justify-between">
-              <span className={`text-sm font-bold ${isChosen ? 'text-blue-700' : 'text-gray-900'}`}>
+              <span className={`text-sm font-bold ${isChosen ? 'text-orange-500' : 'text-gray-900'}`}>
                 {option}
               </span>
               <div className="flex items-center space-x-2 ml-3 shrink-0">
-                <span className={`text-xs font-bold ${isChosen ? 'text-blue-700' : 'text-gray-500'}`}>
+                <span className={`text-xs font-bold ${isChosen ? 'text-orange-500' : 'text-gray-500'}`}>
                   {pct}%
                 </span>
                 <span className="text-[10px] text-gray-400 font-medium">

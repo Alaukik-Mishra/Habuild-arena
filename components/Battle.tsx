@@ -139,14 +139,14 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
           <div />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-            <Clock className="w-10 h-10 text-blue-700" />
+          <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+            <Clock className="w-10 h-10 text-orange-500" />
           </div>
           <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">{config.challenge}</h2>
           <p className="text-sm text-gray-500 mb-6">vs {opponentName}</p>
-          <div className="bg-blue-50 border-2 border-blue-100 rounded-2xl p-6 w-full max-w-xs">
+          <div className="bg-orange-50 border-2 border-orange-100 rounded-2xl p-6 w-full max-w-xs">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Starts in</p>
-            <div className="text-4xl font-black text-blue-700 tracking-widest">
+            <div className="text-4xl font-black text-orange-500 tracking-widest">
               {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
           <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-4 w-full max-w-xs">
             <p className="text-xs text-red-600 font-bold">No one joined in time. Battle expired.</p>
           </div>
-          <button onClick={onBack} className="mt-8 font-bold text-blue-700 uppercase text-xs tracking-widest bg-white border-2 border-gray-200 px-6 py-3 rounded-xl shadow-sm active:scale-95 transition-all">
+          <button onClick={onBack} className="mt-8 font-bold text-orange-500 uppercase text-xs tracking-widest bg-white border-2 border-gray-200 px-6 py-3 rounded-xl shadow-sm active:scale-95 transition-all">
             Return to Arena
           </button>
         </div>
@@ -205,7 +205,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
           <p className="text-xs text-gray-400 mb-8">Target: {targetReps} reps</p>
           <button
             onClick={() => setGameState('playing')}
-            className="bg-blue-700 text-white text-lg font-black uppercase tracking-widest px-10 py-5 rounded-2xl shadow-[0_6px_0_#1e3a8a] active:shadow-none active:translate-y-[6px] transition-all"
+            className="bg-orange-500 text-white text-lg font-black uppercase tracking-widest px-10 py-5 rounded-2xl shadow-[0_6px_0_#c2410c] active:shadow-none active:translate-y-[6px] transition-all"
           >
             I&apos;m Here! Start Battle
           </button>
@@ -224,9 +224,9 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
       {/* Header */}
       <div className="p-6 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
         <button onClick={onBack} className="p-2 -ml-2 text-gray-400 hover:text-gray-900"><ArrowLeft className="w-6 h-6" /></button>
-        <div className={`flex items-center space-x-2 px-4 py-2 rounded-full border ${timeLeft <= 10 ? 'bg-red-100 border-red-200' : 'bg-blue-50 border-blue-100'}`}>
-          <Clock className={`w-4 h-4 ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-blue-700'}`} />
-          <span className={`text-sm font-black tracking-widest ${timeLeft <= 10 ? 'text-red-600' : 'text-blue-700'}`}>{fmtTime(timeLeft)}</span>
+        <div className={`flex items-center space-x-2 px-4 py-2 rounded-full border ${timeLeft <= 10 ? 'bg-red-100 border-red-200' : 'bg-orange-50 border-orange-100'}`}>
+          <Clock className={`w-4 h-4 ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-orange-500'}`} />
+          <span className={`text-sm font-black tracking-widest ${timeLeft <= 10 ? 'text-red-600' : 'text-orange-500'}`}>{fmtTime(timeLeft)}</span>
         </div>
         <button
           onClick={() => setShowWithdrawConfirm(true)}
@@ -241,15 +241,15 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
         <div className="grid grid-cols-2 gap-4 relative">
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <div className="bg-white p-2 rounded-full shadow-xl border-4 border-gray-50">
-              <span className="text-xs font-black text-blue-700 italic px-1 uppercase">VS</span>
+              <span className="text-xs font-black text-orange-500 italic px-1 uppercase">VS</span>
             </div>
           </div>
           {/* You */}
           <div className="bg-white border-2 border-gray-100 rounded-3xl p-5 flex flex-col items-center shadow-sm relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 h-1 bg-blue-500 transition-all duration-300" style={{ width: `${Math.min(100, (userReps / targetReps) * 100)}%` }} />
+            <div className="absolute bottom-0 left-0 h-1 bg-orange-500 transition-all duration-300" style={{ width: `${Math.min(100, (userReps / targetReps) * 100)}%` }} />
             <img src={`https://ui-avatars.com/api/?name=${userName}&background=1D4ED8&color=fff`} className="w-16 h-16 rounded-full mb-3 border-4 border-gray-50 shadow-md" alt="You" />
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">YOU</span>
-            <span className="text-4xl font-serif font-black text-blue-700">{userReps}</span>
+            <span className="text-4xl font-serif font-black text-orange-500">{userReps}</span>
             <span className="text-[10px] text-gray-400 mt-1">/ {targetReps}</span>
           </div>
           {/* Opponent */}
@@ -298,7 +298,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
               <button onClick={() => alert('Shared!')} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold text-gray-600 uppercase tracking-widest border-2 border-gray-200 bg-gray-50 rounded-xl">
                 <Share2 className="w-5 h-5 mb-1 text-gray-500" /> Share
               </button>
-              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
+              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-orange-500 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#c2410c] active:shadow-none active:translate-y-[3px] transition-all">
                 <Swords className="w-5 h-5 mb-1" /> Rematch
               </button>
             </div>
@@ -326,7 +326,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
               <button onClick={() => alert('Shared!')} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold text-gray-600 uppercase tracking-widest border-2 border-gray-200 bg-gray-50 rounded-xl">
                 <Share2 className="w-5 h-5 mb-1 text-gray-500" /> Share
               </button>
-              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-blue-700 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#1e3a8a] active:shadow-none active:translate-y-[3px] transition-all">
+              <button onClick={onBack} className="flex-1 py-3.5 flex flex-col justify-center items-center text-[9px] font-bold bg-orange-500 text-white uppercase tracking-widest rounded-xl shadow-[0_3px_0_#c2410c] active:shadow-none active:translate-y-[3px] transition-all">
                 <Swords className="w-5 h-5 mb-1" /> Rematch
               </button>
             </div>

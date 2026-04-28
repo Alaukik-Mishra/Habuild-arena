@@ -73,10 +73,10 @@ export default function Login({ onLogin }: Props) {
       <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full space-y-10">
 
         <div className="text-center space-y-3">
-          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center transform rotate-3">
-            <Swords className="w-10 h-10 text-primary" />
+          <div className="mx-auto w-20 h-20 bg-orange-500/10 rounded-3xl flex items-center justify-center transform rotate-3">
+            <Swords className="w-10 h-10 text-orange-500" />
           </div>
-          <h1 className="text-5xl font-serif font-bold text-primary italic tracking-tight">Arena</h1>
+          <h1 className="text-5xl font-serif font-bold text-orange-500 italic tracking-tight">Arena</h1>
           <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Enter the Battleground</p>
         </div>
 
@@ -94,7 +94,7 @@ export default function Login({ onLogin }: Props) {
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Leo"
-              className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-4 font-bold text-gray-800 placeholder:text-gray-300 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-[0_4px_0_#f3f4f6] focus:shadow-[0_2px_0_#f3f4f6] focus:translate-y-[2px]"
+              className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-4 font-bold text-gray-800 placeholder:text-gray-300 outline-none focus:border-orange-400 focus:ring-4 focus:ring-primary/10 transition-all shadow-[0_4px_0_#f3f4f6] focus:shadow-[0_2px_0_#f3f4f6] focus:translate-y-[2px]"
             />
           </div>
 
@@ -104,7 +104,7 @@ export default function Login({ onLogin }: Props) {
               <select
                 value={countryCode}
                 onChange={e => setCountryCode(e.target.value)}
-                className="bg-white border-2 border-gray-200 rounded-xl px-2 py-4 font-bold text-gray-800 outline-none focus:border-primary shadow-[0_4px_0_#f3f4f6]"
+                className="bg-white border-2 border-gray-200 rounded-xl px-2 py-4 font-bold text-gray-800 outline-none focus:border-orange-400 shadow-[0_4px_0_#f3f4f6]"
               >
                 <option value="+1">🇺🇸 +1</option>
                 <option value="+44">🇬🇧 +44</option>
@@ -117,7 +117,7 @@ export default function Login({ onLogin }: Props) {
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 placeholder="999-999-9999"
-                className="flex-1 w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-4 font-bold text-gray-800 placeholder:text-gray-300 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-[0_4px_0_#f3f4f6] focus:shadow-[0_2px_0_#f3f4f6] focus:translate-y-[2px]"
+                className="flex-1 w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-4 font-bold text-gray-800 placeholder:text-gray-300 outline-none focus:border-orange-400 focus:ring-4 focus:ring-primary/10 transition-all shadow-[0_4px_0_#f3f4f6] focus:shadow-[0_2px_0_#f3f4f6] focus:translate-y-[2px]"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function Login({ onLogin }: Props) {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-primary text-white rounded-xl py-5 font-bold tracking-widest text-lg shadow-[0_6px_0_var(--color-primary-dark)] active:shadow-[0_0px_0_var(--color-primary-dark)] active:translate-y-[6px] transition-all flex items-center justify-center disabled:opacity-50"
+            className="w-full bg-orange-500 text-white rounded-xl py-5 font-bold tracking-widest text-lg shadow-[0_6px_0_var(--color-primary-dark)] active:shadow-[0_0px_0_var(--color-primary-dark)] active:translate-y-[6px] transition-all flex items-center justify-center disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <span className="uppercase text-[15px] leading-none">Enter Arena</span>}
           </button>

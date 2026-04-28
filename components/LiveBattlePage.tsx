@@ -269,9 +269,9 @@ export default function LiveBattlePage({
             </div>
           )}
           {isUpcoming && (
-            <div className="flex items-center space-x-1.5 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
-              <Clock className="w-3.5 h-3.5 text-blue-600" />
-              <span className="text-xs font-black text-blue-600">{countdown}</span>
+            <div className="flex items-center space-x-1.5 bg-orange-50 px-3 py-1.5 rounded-full border border-orange-100">
+              <Clock className="w-3.5 h-3.5 text-orange-500" />
+              <span className="text-xs font-black text-orange-500">{countdown}</span>
             </div>
           )}
           {isCompleted && (
@@ -300,15 +300,15 @@ export default function LiveBattlePage({
           <div className="flex items-center justify-between bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm">
             <div className="relative flex flex-col items-center flex-1">
               <RepPulse pulses={repPulses} side="p1" />
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-xl mb-2 border-2 border-blue-500">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold text-xl mb-2 border-2 border-orange-400">
                 {battle.p1.name[0]}
               </div>
               <span className="text-sm font-bold text-gray-900">{battle.p1.name}</span>
               <span className="text-[10px] text-gray-400">{battle.p1.wins}W • {battle.p1.streak}🔥</span>
               <div className="w-20 bg-gray-100 h-2 rounded-full mt-2 overflow-hidden">
-                <div className="bg-blue-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
+                <div className="bg-orange-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
               </div>
-              <span className="text-xs font-black text-blue-700 mt-1">{battle.p1Reps}/{battle.target}</span>
+              <span className="text-xs font-black text-orange-500 mt-1">{battle.p1Reps}/{battle.target}</span>
             </div>
 
             <div className="flex flex-col items-center px-3">
@@ -368,7 +368,7 @@ export default function LiveBattlePage({
           <div className="px-5 pb-4">
             <button
               onClick={() => onJoinBattle(battle)}
-              className="w-full py-4 bg-blue-700 text-white font-black uppercase tracking-widest rounded-2xl shadow-[0_5px_0_#1e3a8a] active:shadow-none active:translate-y-[5px] transition-all flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-[0_5px_0_#c2410c] active:shadow-none active:translate-y-[5px] transition-all flex items-center justify-center space-x-2"
             >
               <Zap className="w-5 h-5 fill-current" />
               <span>Go Live — Join Battle</span>
@@ -390,7 +390,7 @@ export default function LiveBattlePage({
             <div className="flex space-x-2">
               {bettingOpen && points >= BET_AMOUNT ? (
                 <>
-                  <button onClick={() => setPendingBet(battle.p1.name)} className="flex-1 py-3 bg-blue-50 text-blue-700 text-[11px] font-bold uppercase rounded-xl border-2 border-blue-200 active:bg-blue-100">Bet 50 on {battle.p1.name}</button>
+                  <button onClick={() => setPendingBet(battle.p1.name)} className="flex-1 py-3 bg-orange-50 text-orange-500 text-[11px] font-bold uppercase rounded-xl border-2 border-orange-200 active:bg-orange-100">Bet 50 on {battle.p1.name}</button>
                   <button onClick={() => setPendingBet(battle.p2.name)} className="flex-1 py-3 bg-red-50 text-red-700 text-[11px] font-bold uppercase rounded-xl border-2 border-red-200 active:bg-red-100">Bet 50 on {battle.p2.name}</button>
                 </>
               ) : bettingOpen ? (
@@ -438,10 +438,10 @@ export default function LiveBattlePage({
                     key={player}
                     onClick={() => handlePollVote(player)}
                     disabled={!!myPollVote}
-                    className={`w-full mb-2 rounded-xl overflow-hidden border-2 transition-all ${myPollVote === player ? 'border-blue-500' : 'border-gray-100'}`}
+                    className={`w-full mb-2 rounded-xl overflow-hidden border-2 transition-all ${myPollVote === player ? 'border-orange-400' : 'border-gray-100'}`}
                   >
                     <div className="relative bg-gray-50 px-4 py-3 flex items-center justify-between">
-                      <div className="absolute left-0 top-0 h-full bg-blue-100 transition-all" style={{ width: `${pct}%` }} />
+                      <div className="absolute left-0 top-0 h-full bg-orange-100 transition-all" style={{ width: `${pct}%` }} />
                       <span className="relative font-bold text-sm text-gray-900">{player}</span>
                       <span className="relative text-xs font-bold text-gray-500">{pct}% ({votes})</span>
                     </div>
@@ -465,7 +465,7 @@ export default function LiveBattlePage({
             )}
             {battle.comments.map(c => (
               <div key={c.id} className="bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
-                <span className="font-bold text-blue-700 text-xs">{c.user}</span>
+                <span className="font-bold text-orange-500 text-xs">{c.user}</span>
                 <p className="text-xs text-gray-600 mt-0.5">{c.text}</p>
               </div>
             ))}
@@ -477,9 +477,9 @@ export default function LiveBattlePage({
               onChange={e => setCommentText(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAddComment()}
               placeholder="Add a comment..."
-              className="flex-1 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500"
+              className="flex-1 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-orange-400"
             />
-            <button onClick={handleAddComment} className="bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
+            <button onClick={handleAddComment} className="bg-orange-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
           </div>
         </div>
       </div>
@@ -490,7 +490,7 @@ export default function LiveBattlePage({
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPendingBet(null)} />
           <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 relative z-10 shadow-2xl">
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-2">Confirm Bet</h3>
-            <p className="text-sm text-gray-600 mb-2">Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-blue-700">{pendingBet}</strong>?</p>
+            <p className="text-sm text-gray-600 mb-2">Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-orange-500">{pendingBet}</strong>?</p>
             <p className="text-xs text-gray-400 mb-8">Result paid out when battle ends.</p>
             <div className="flex space-x-3">
               <button onClick={() => setPendingBet(null)} className="flex-1 py-3.5 bg-gray-50 text-gray-600 font-bold text-xs uppercase tracking-wider rounded-xl border border-gray-200">Cancel</button>

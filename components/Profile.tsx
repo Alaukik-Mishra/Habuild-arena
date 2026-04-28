@@ -66,7 +66,7 @@ export default function Profile({ user, betHistory, points, onLogout }: Props) {
                 <div className="flex justify-between items-center text-[10px]">
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-400">Bet on:</span>
-                    <span className="font-bold text-primary">{bet.playerBetOn}</span>
+                    <span className="font-bold text-orange-500">{bet.playerBetOn}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-400">Winner:</span>
@@ -85,13 +85,13 @@ export default function Profile({ user, betHistory, points, onLogout }: Props) {
 
       <div className="space-y-4">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Ongoing Journey</h3>
-          <div className="bg-primary/5 border-2 border-primary/10 rounded-2xl p-5">
+          <div className="bg-orange-500/5 border-2 border-orange-500/10 rounded-2xl p-5">
             <div className="flex justify-between items-center mb-2">
-              <span className="font-bold text-primary text-sm">Iron Will Milestone</span>
-              <span className="text-xs font-bold text-primary">{Math.min(100, Math.round((user.wins / 10) * 100))}%</span>
+              <span className="font-bold text-orange-500 text-sm">Iron Will Milestone</span>
+              <span className="text-xs font-bold text-orange-500">{Math.min(100, Math.round((user.wins / 10) * 100))}%</span>
             </div>
-            <div className="w-full h-2 bg-primary/10 rounded-full overflow-hidden flex">
-              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((user.wins / 10) * 100))}%` }} />
+            <div className="w-full h-2 bg-orange-500/10 rounded-full overflow-hidden flex">
+              <div className="h-full bg-orange-500 rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((user.wins / 10) * 100))}%` }} />
             </div>
             <p className="text-[10px] text-gray-500 font-medium mt-3">
               {user.wins >= 10 ? 'Elite Avatar frame unlocked! 🏆' : `Win ${10 - user.wins} more battle${10 - user.wins === 1 ? '' : 's'} to unlock Elite Avatar frame.`}

@@ -24,14 +24,14 @@ function shouldShowButtons(userVotedIndex: number | undefined, disabled: boolean
 function getOptionClasses(userVotedIndex: number | undefined, optionIndex: number): string {
   const isChosen = userVotedIndex === optionIndex;
   return isChosen
-    ? 'bg-blue-50 border-blue-400'
+    ? 'bg-orange-50 border-blue-400'
     : 'bg-white border-gray-100';
 }
 
 /** Returns the label text classes for a result-bar row (Req 8.3) */
 function getLabelClasses(userVotedIndex: number | undefined, optionIndex: number): string {
   const isChosen = userVotedIndex === optionIndex;
-  return isChosen ? 'text-blue-700' : 'text-gray-900';
+  return isChosen ? 'text-orange-500' : 'text-gray-900';
 }
 
 // ─── Un-voted state (Req 8.1) ─────────────────────────────────────────────────
@@ -93,15 +93,15 @@ describe('PollOptions – voted state renders result bars with correct percentag
 // ─── Chosen option highlighting (Req 8.3) ────────────────────────────────────
 
 describe('PollOptions – chosen option is highlighted', () => {
-  it('applies bg-blue-50 and border-blue-400 to the voted option', () => {
+  it('applies bg-orange-50 and border-blue-400 to the voted option', () => {
     const classes = getOptionClasses(0, 0);
-    expect(classes).toContain('bg-blue-50');
+    expect(classes).toContain('bg-orange-50');
     expect(classes).toContain('border-blue-400');
   });
 
   it('does not apply highlight classes to non-voted options', () => {
     const classes = getOptionClasses(0, 1);
-    expect(classes).not.toContain('bg-blue-50');
+    expect(classes).not.toContain('bg-orange-50');
     expect(classes).not.toContain('border-blue-400');
     expect(classes).toContain('bg-white');
     expect(classes).toContain('border-gray-100');
@@ -109,11 +109,11 @@ describe('PollOptions – chosen option is highlighted', () => {
 
   it('highlights the correct option when userVotedIndex is 1', () => {
     expect(getOptionClasses(1, 0)).toContain('bg-white');
-    expect(getOptionClasses(1, 1)).toContain('bg-blue-50');
+    expect(getOptionClasses(1, 1)).toContain('bg-orange-50');
   });
 
   it('applies blue text to the chosen option label', () => {
-    expect(getLabelClasses(0, 0)).toBe('text-blue-700');
+    expect(getLabelClasses(0, 0)).toBe('text-orange-500');
   });
 
   it('applies gray text to non-chosen option labels', () => {

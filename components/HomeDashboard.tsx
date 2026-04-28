@@ -38,14 +38,14 @@ function useCountdown(targetMs: number) {
 
 function CountdownBadge({ scheduledTime }: { scheduledTime: number }) {
   const ms = useCountdown(scheduledTime);
-  if (ms <= 0) return <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 flex items-center text-[10px] font-bold uppercase"><Clock className="w-3 h-3 mr-1" />Starting…</span>;
+  if (ms <= 0) return <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200 flex items-center text-[10px] font-bold uppercase"><Clock className="w-3 h-3 mr-1" />Starting…</span>;
   const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
   const label = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
   return (
-    <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 flex items-center text-[10px] font-bold uppercase">
+    <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200 flex items-center text-[10px] font-bold uppercase">
       <Clock className="w-3 h-3 mr-1" />{label}
     </span>
   );
@@ -209,7 +209,7 @@ export default function HomeDashboard({
               {/* Top row */}
               <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
                 <div className="flex flex-col flex-1 mr-2">
-                  <h4 className="font-serif text-lg font-bold text-blue-700 leading-tight">{battle.challenge}</h4>
+                  <h4 className="font-serif text-lg font-bold text-orange-500 leading-tight">{battle.challenge}</h4>
                   <div className="flex flex-wrap items-center gap-1 mt-1">
                     {isCompleted ? (
                       <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 text-[10px] font-bold uppercase">Completed</span>
@@ -240,11 +240,11 @@ export default function HomeDashboard({
               {/* Players */}
               <div className="flex justify-between items-center mb-4">
                 <div onClick={e => { e.stopPropagation(); setSelectedProfile(battle.p1); }} className="flex flex-col items-center flex-1 cursor-pointer">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold mb-1 border-2 border-blue-500 shadow-sm">{battle.p1.name[0]}</div>
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold mb-1 border-2 border-orange-400 shadow-sm">{battle.p1.name[0]}</div>
                   <span className="text-[10px] font-bold text-gray-800">{battle.p1.name}</span>
                   <div className="text-[8px] text-gray-400 font-bold bg-gray-50 px-1.5 py-0.5 rounded mt-0.5">{battle.p1.wins}W • {battle.p1.streak}🔥</div>
                   <div className="w-16 bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                    <div className="bg-blue-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
+                    <div className="bg-orange-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (battle.p1Reps / battle.target) * 100)}%` }} />
                   </div>
                   <span className="text-[9px] text-gray-400 mt-0.5">{battle.p1Reps}/{battle.target}</span>
                 </div>
@@ -278,7 +278,7 @@ export default function HomeDashboard({
                 <div className="flex space-x-2" onClick={e => e.stopPropagation()}>
                   {bettingOpen && points >= 50 ? (
                     <>
-                      <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p1.name })} className="flex-1 py-3 bg-blue-50 text-blue-700 text-[11px] font-bold uppercase rounded-lg border-2 border-blue-200 active:bg-blue-100 transition-colors shadow-sm">Bet 50 on {battle.p1.name}</button>
+                      <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p1.name })} className="flex-1 py-3 bg-orange-50 text-orange-500 text-[11px] font-bold uppercase rounded-lg border-2 border-orange-200 active:bg-orange-100 transition-colors shadow-sm">Bet 50 on {battle.p1.name}</button>
                       <button onClick={() => setPendingBet({ battleId: battle.id, player: battle.p2.name })} className="flex-1 py-3 bg-red-50 text-red-700 text-[11px] font-bold uppercase rounded-lg border-2 border-red-200 active:bg-red-100 transition-colors shadow-sm">Bet 50 on {battle.p2.name}</button>
                     </>
                   ) : bettingOpen ? (
@@ -330,7 +330,7 @@ export default function HomeDashboard({
                 {battle.comments.length === 0 && <p className="text-center text-xs text-gray-300 mt-8">No comments yet. Be the first!</p>}
                 {battle.comments.map(c => (
                   <div key={c.id} className="bg-gray-50 rounded-xl p-3">
-                    <span className="font-bold text-blue-700 text-xs">{c.user}</span>
+                    <span className="font-bold text-orange-500 text-xs">{c.user}</span>
                     <p className="text-xs text-gray-600 mt-1">{c.text}</p>
                   </div>
                 ))}
@@ -342,9 +342,9 @@ export default function HomeDashboard({
                   onChange={e => setCommentText(prev => ({ ...prev, [battle.id]: e.target.value }))}
                   onKeyDown={e => e.key === 'Enter' && handleAddComment(battle.id)}
                   placeholder="Add a comment..."
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500"
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-orange-400"
                 />
-                <button onClick={() => handleAddComment(battle.id)} className="bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
+                <button onClick={() => handleAddComment(battle.id)} className="bg-orange-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Post</button>
               </div>
             </div>
           </div>
@@ -358,7 +358,7 @@ export default function HomeDashboard({
           <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 relative z-10 shadow-2xl">
             <button onClick={() => setSelectedProfile(null)} className="absolute top-4 right-4 text-gray-400 bg-gray-50 rounded-full p-1 border border-gray-200"><X className="w-5 h-5" /></button>
             <div className="flex flex-col items-center mt-6 mb-8">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-3xl mb-3 border-4 border-blue-200">
+              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold text-3xl mb-3 border-4 border-orange-200">
                 {selectedProfile.name[0]}
               </div>
               <h2 className="text-2xl font-serif font-bold text-gray-900">{selectedProfile.name}</h2>
@@ -386,7 +386,7 @@ export default function HomeDashboard({
           <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 relative z-10 shadow-2xl">
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-2">Confirm Bet</h3>
             <p className="text-sm text-gray-600 mb-2 leading-relaxed">
-              Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-blue-700">{pendingBet.player}</strong>?
+              Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-orange-500">{pendingBet.player}</strong>?
             </p>
             <p className="text-xs text-gray-400 mb-8">Result is paid out only after the battle ends.</p>
             <div className="flex space-x-3">

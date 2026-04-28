@@ -22,7 +22,7 @@ export default function PredictionPoll({ p1Name, p2Name, votes, myVote, onVote }
         Who Will Win? 🏆
       </h3>
 
-      {[{ name: p1Name, pct: p1Pct, color: 'bg-blue-500', border: 'border-blue-500' },
+      {[{ name: p1Name, pct: p1Pct, color: 'bg-orange-500', border: 'border-orange-400' },
         { name: p2Name, pct: p2Pct, color: 'bg-red-500', border: 'border-red-500' }].map(player => (
         <button
           key={player.name}

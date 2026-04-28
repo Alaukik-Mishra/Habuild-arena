@@ -355,7 +355,7 @@ export default function CommunityFeed({ user, points }: Props) {
       <div className="px-5 pb-3 shrink-0">
         <button
           onClick={() => setComposerOpen(true)}
-          className="w-full bg-blue-700 text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-2xl shadow-[0_4px_0_#1e3a8a] active:shadow-none active:translate-y-1 transition-all"
+          className="w-full bg-orange-500 text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-2xl shadow-[0_4px_0_#c2410c] active:shadow-none active:translate-y-1 transition-all"
         >
           + Create Post
         </button>
