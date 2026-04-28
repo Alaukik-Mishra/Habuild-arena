@@ -1,5 +1,5 @@
 // types/index.ts
-export type AppScreen = 'dashboard' | 'arena' | 'battle' | 'profile' | 'leaderboard' | 'live' | 'referral';
+export type AppScreen = 'dashboard' | 'arena' | 'battle' | 'profile' | 'leaderboard' | 'live' | 'referral' | 'community';
 
 export interface UserProfile {
   name: string;
@@ -175,4 +175,34 @@ export interface PollVoteBroadcast {
 export interface SpectatorCountBroadcast {
   type: 'spectator_count';
   count: number;
+}
+
+// Community Feed Types
+export type PostType = 'question' | 'poll' | 'meme';
+
+export interface CommunityPost {
+  id: string;
+  authorName: string;
+  postType: PostType;
+  content: {
+    text?: string; // question text or meme caption
+    imageUrl?: string; // meme image
+    pollQuestion?: string;
+    pollOptions?: string[]; // 2-4 options
+  };
+  likeCount: number;
+  commentCount: number;
+  repostCount: number;
+  createdAt: number; // timestamp
+  isLikedByUser: boolean;
+  isRepostedByUser: boolean;
+  userVotedOptionIndex?: number; // for polls
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  authorName: string;
+  text: string;
+  createdAt: number;
 }

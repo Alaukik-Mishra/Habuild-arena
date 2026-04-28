@@ -2,7 +2,8 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import Login from '@/components/Login';
-import Dashboard from '@/components/Dashboard';
+import CommunityFeed from '@/components/CommunityFeed';
+import HomeDashboard from '@/components/HomeDashboard';
 import Arena from '@/components/Arena';
 import Battle from '@/components/Battle';
 import Profile from '@/components/Profile';
@@ -83,6 +84,7 @@ const INITIAL_CHAT_THREADS: ChatThread[] = [
     messages: [
       { id: 'm1', sender: 'Arjun', text: 'You ready for tomorrow?', timestamp: _now - 3600000 },
       { id: 'm2', sender: 'You', text: 'Always ready!', timestamp: _now - 3500000 },
+      { id: 'm3', sender: 'Arjun', text: 'Let\'s go 💪 I\'m doing 100 pushups', timestamp: _now - 3400000 },
     ],
   },
   {
@@ -91,6 +93,35 @@ const INITIAL_CHAT_THREADS: ChatThread[] = [
     messages: [
       { id: 'm4', sender: 'Priya', text: 'GG nice pushups!', timestamp: _now - 10800000 },
       { id: 'm5', sender: 'You', text: 'Thanks! You were close too', timestamp: _now - 10700000 },
+      { id: 'm6', sender: 'Priya', text: 'Rematch tomorrow? 🔥', timestamp: _now - 10600000 },
+      { id: 'm7', sender: 'You', text: 'You\'re on!', timestamp: _now - 10500000 },
+    ],
+  },
+  {
+    id: 't3',
+    participants: ['You', 'Kunal'],
+    messages: [
+      { id: 'm8', sender: 'Kunal', text: 'Bro I challenged you to a plank battle', timestamp: _now - 7200000 },
+      { id: 'm9', sender: 'You', text: 'Saw it, accepting now', timestamp: _now - 7100000 },
+      { id: 'm10', sender: 'Kunal', text: 'Don\'t chicken out 😂', timestamp: _now - 7000000 },
+    ],
+  },
+  {
+    id: 't4',
+    participants: ['You', 'Rahul'],
+    messages: [
+      { id: 'm11', sender: 'Rahul', text: 'How many squats did you do today?', timestamp: _now - 86400000 },
+      { id: 'm12', sender: 'You', text: '150! New PR 🎉', timestamp: _now - 86300000 },
+      { id: 'm13', sender: 'Rahul', text: 'Beast mode activated', timestamp: _now - 86200000 },
+    ],
+  },
+  {
+    id: 't5',
+    participants: ['You', 'Neha'],
+    messages: [
+      { id: 'm14', sender: 'Neha', text: 'Hey! Want to join our group challenge?', timestamp: _now - 172800000 },
+      { id: 'm15', sender: 'You', text: 'What\'s the challenge?', timestamp: _now - 172700000 },
+      { id: 'm16', sender: 'Neha', text: '30 day plank streak 🏆', timestamp: _now - 172600000 },
     ],
   },
 ];
@@ -124,6 +155,7 @@ export default function HabuildArena() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('dashboard');
   const [points, setPoints] = useState(1000);
+  const [sessionLoading, setSessionLoading] = useState(true);
   const [battles, setBattles] = useState<LiveBattle[]>(INITIAL_BATTLES);
   const [bets, setBets] = useState<Record<string, string>>({});
   const [betHistory, setBetHistory] = useState<BetRecord[]>([]);
@@ -139,6 +171,29 @@ export default function HabuildArena() {
   const [battleFilter, setBattleFilter] = useState<BattleFilter>('all');
   const [now, setNow] = useState(() => Date.now());
   const [loading, setLoading] = useState(false);
+
+  // ─── Restore session from localStorage ──────────────────────────────────────
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('arena_user');
+      if (saved) {
+        const parsed: UserProfile = JSON.parse(saved);
+        setUser(parsed);
+        setPoints(parsed.points);
+      }
+    } catch {
+      // ignore corrupt data
+    } finally {
+      setSessionLoading(false);
+    }
+  }, []);
+
+  // Persist user to localStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('arena_user', JSON.stringify({ ...user, points }));
+    }
+  }, [user, points]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 30000);
@@ -255,6 +310,7 @@ export default function HabuildArena() {
   }, [battles, bets, user]);
 
   const handleLogout = () => {
+    localStorage.removeItem('arena_user');
     setUser(null);
     setPoints(1000);
     setBattles(INITIAL_BATTLES);
@@ -272,6 +328,14 @@ export default function HabuildArena() {
     setBattleFilter('all');
     setCurrentScreen('dashboard');
   };
+
+  if (sessionLoading) {
+    return (
+      <AppShell hideNav>
+        <div className="flex-1 flex items-center justify-center text-gray-400 font-bold text-xs uppercase tracking-widest">Loading Arena...</div>
+      </AppShell>
+    );
+  }
 
   if (loading && !user) {
     return (
@@ -346,26 +410,24 @@ export default function HabuildArena() {
   return (
     <AppShell currentScreen={currentScreen} onNavigate={setCurrentScreen}>
       {currentScreen === 'dashboard' && (
-        <Dashboard
+        <HomeDashboard
           user={user}
           points={points}
-          setPoints={setPoints}
           battles={battles}
-          setBattles={setBattles}
           bets={bets}
           setBets={setBets}
           now={now}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          battleFilter={battleFilter}
-          setBattleFilter={setBattleFilter}
+          setPoints={setPoints}
+          setBattles={setBattles}
           activeBattleId={activeBattleId}
           setActiveBattleId={setActiveBattleId}
           setActiveBattleConfig={setActiveBattleConfig}
           setCurrentScreen={setCurrentScreen}
-          selectedBattleId={selectedBattleId}
           setSelectedBattleId={setSelectedBattleId}
         />
+      )}
+      {currentScreen === 'community' && (
+        <CommunityFeed user={user} points={points} />
       )}
       {currentScreen === 'arena' && (
         <Arena
@@ -429,6 +491,23 @@ export default function HabuildArena() {
           onCreateChatThread={async (participants: string[]) => {
             try { return await createChatThread(participants); } catch (e) { console.error(e); return 't' + Date.now(); }
           }}
+          user={user}
+          points={points}
+          setPoints={setPoints}
+          battles={battles}
+          setBattles={setBattles}
+          bets={bets}
+          setBets={setBets}
+          now={now}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          battleFilter={battleFilter}
+          setBattleFilter={setBattleFilter}
+          activeBattleId={activeBattleId}
+          setBattlesActiveBattleId={setActiveBattleId}
+          setCurrentScreen={setCurrentScreen}
+          selectedBattleId={selectedBattleId}
+          setSelectedBattleId={setSelectedBattleId}
         />
       )}
       {currentScreen === 'profile' && (

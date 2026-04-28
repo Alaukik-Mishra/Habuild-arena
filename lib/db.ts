@@ -462,3 +462,153 @@ export async function broadcastRepPulse(
     payload: { type: 'rep_pulse', player, count, timestamp: Date.now() },
   });
 }
+
+// ─── Community Feed ───────────────────────────────────────────────────────────
+
+import type { CommunityPost, PostComment } from '@/types';
+
+export async function getPosts(userName: string): Promise<CommunityPost[]> {
+  const [postsResult, likesResult, repostsResult, votesResult, likeCounts, repostCounts, commentCounts] =
+    await Promise.all([
+      supabase.from('community_posts').select('*').order('created_at', { ascending: false }),
+      supabase.from('post_likes').select('post_id').eq('user_name', userName),
+      supabase.from('post_reposts').select('post_id').eq('user_name', userName),
+      supabase.from('post_poll_votes').select('post_id, option_index').eq('user_name', userName),
+      supabase.from('post_likes').select('post_id'),
+      supabase.from('post_reposts').select('post_id'),
+      supabase.from('post_comments').select('post_id'),
+    ]);
+
+  if (postsResult.error) throw postsResult.error;
+
+  const likedPostIds = new Set((likesResult.data || []).map((r: { post_id: string }) => r.post_id));
+  const repostedPostIds = new Set((repostsResult.data || []).map((r: { post_id: string }) => r.post_id));
+  const voteMap = new Map<string, number>(
+    (votesResult.data || []).map((r: { post_id: string; option_index: number }) => [r.post_id, r.option_index])
+  );
+
+  const likeCountMap = new Map<string, number>();
+  for (const r of (likeCounts.data || []) as { post_id: string }[]) {
+    likeCountMap.set(r.post_id, (likeCountMap.get(r.post_id) ?? 0) + 1);
+  }
+  const repostCountMap = new Map<string, number>();
+  for (const r of (repostCounts.data || []) as { post_id: string }[]) {
+    repostCountMap.set(r.post_id, (repostCountMap.get(r.post_id) ?? 0) + 1);
+  }
+  const commentCountMap = new Map<string, number>();
+  for (const r of (commentCounts.data || []) as { post_id: string }[]) {
+    commentCountMap.set(r.post_id, (commentCountMap.get(r.post_id) ?? 0) + 1);
+  }
+
+  return (postsResult.data || []).map((row: {
+    id: string;
+    author_name: string;
+    post_type: string;
+    content: CommunityPost['content'];
+    created_at: string;
+  }): CommunityPost => ({
+    id: row.id,
+    authorName: row.author_name,
+    postType: row.post_type as CommunityPost['postType'],
+    content: row.content,
+    likeCount: likeCountMap.get(row.id) ?? 0,
+    commentCount: commentCountMap.get(row.id) ?? 0,
+    repostCount: repostCountMap.get(row.id) ?? 0,
+    createdAt: new Date(row.created_at).getTime(),
+    isLikedByUser: likedPostIds.has(row.id),
+    isRepostedByUser: repostedPostIds.has(row.id),
+    userVotedOptionIndex: voteMap.get(row.id),
+  }));
+}
+
+export async function createPost(
+  post: Omit<CommunityPost, 'id' | 'likeCount' | 'commentCount' | 'repostCount' | 'createdAt' | 'isLikedByUser' | 'isRepostedByUser'>
+): Promise<string> {
+  const { data, error } = await supabase
+    .from('community_posts')
+    .insert({
+      author_name: post.authorName,
+      post_type: post.postType,
+      content: post.content,
+    })
+    .select('id')
+    .single();
+  if (error) throw error;
+  return data.id;
+}
+
+export async function deletePost(postId: string): Promise<void> {
+  const { error } = await supabase.from('community_posts').delete().eq('id', postId);
+  if (error) throw error;
+}
+
+export async function toggleLike(postId: string, userName: string, isLiked: boolean): Promise<void> {
+  if (isLiked) {
+    const { error } = await supabase
+      .from('post_likes')
+      .delete()
+      .eq('post_id', postId)
+      .eq('user_name', userName);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from('post_likes')
+      .insert({ post_id: postId, user_name: userName });
+    if (error) throw error;
+  }
+}
+
+export async function addComment(postId: string, authorName: string, text: string): Promise<PostComment> {
+  const { data, error } = await supabase
+    .from('post_comments')
+    .insert({ post_id: postId, author_name: authorName, text })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    postId: data.post_id,
+    authorName: data.author_name,
+    text: data.text,
+    createdAt: new Date(data.created_at).getTime(),
+  };
+}
+
+export async function getComments(postId: string): Promise<PostComment[]> {
+  const { data, error } = await supabase
+    .from('post_comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data || []).map((row: { id: string; post_id: string; author_name: string; text: string; created_at: string }) => ({
+    id: row.id,
+    postId: row.post_id,
+    authorName: row.author_name,
+    text: row.text,
+    createdAt: new Date(row.created_at).getTime(),
+  }));
+}
+
+export async function toggleRepost(postId: string, userName: string, isReposted: boolean): Promise<void> {
+  if (isReposted) {
+    const { error } = await supabase
+      .from('post_reposts')
+      .delete()
+      .eq('post_id', postId)
+      .eq('user_name', userName);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from('post_reposts')
+      .insert({ post_id: postId, user_name: userName });
+    if (error) throw error;
+  }
+}
+
+export async function castPostPollVote(postId: string, userName: string, optionIndex: number): Promise<void> {
+  const { error } = await supabase
+    .from('post_poll_votes')
+    .insert({ post_id: postId, user_name: userName, option_index: optionIndex });
+  if (error) throw error;
+}

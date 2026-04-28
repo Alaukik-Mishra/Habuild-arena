@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Swords, Trophy, User, Gift } from 'lucide-react';
+import { Home, Swords, Trophy, MessageSquare, User } from 'lucide-react';
 import { AppScreen } from '../types';
 
 interface Props {
@@ -12,7 +12,7 @@ export default function BottomNav({ current, onNavigate }: Props) {
     { screen: 'dashboard' as AppScreen, icon: Home, label: 'HOME' },
     { screen: 'arena' as AppScreen, icon: Swords, label: 'ARENA' },
     { screen: 'leaderboard' as AppScreen, icon: Trophy, label: 'RANK' },
-    { screen: 'referral' as AppScreen, icon: Gift, label: 'REFER' },
+    { screen: 'community' as AppScreen, icon: MessageSquare, label: 'COMMUNITY' },
     { screen: 'profile' as AppScreen, icon: User, label: 'ME' },
   ];
 
