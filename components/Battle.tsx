@@ -23,7 +23,7 @@ interface Props {
 type GameState = 'waiting' | 'playing' | 'victory' | 'loss' | 'timeUp';
 
 const INITIAL_TIME_SECONDS = 120;
-const GRACE_PERIOD_SECONDS = 60;
+const GRACE_PERIOD_SECONDS = 3600; // 1 hour window to join
 
 export default function Battle({ onBack, config, userName, onWithdraw, activeBattleId, onBattleEnd, playerSide }: Props) {
   const [gameState, setGameState] = useState<GameState>('waiting');
@@ -156,19 +156,19 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
       <div className="flex-1 w-full flex flex-col bg-[#FDFCF7]">
         <div className="p-6 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
           <button onClick={onBack} className="p-2 -ml-2 text-gray-400 hover:text-gray-900"><ArrowLeft className="w-6 h-6" /></button>
-          <h2 className="font-bold text-gray-900">Missed Battle</h2>
+          <h2 className="font-bold text-gray-900">Battle Expired</h2>
           <div />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
             <AlertTriangle className="w-10 h-10 text-red-500" />
           </div>
-          <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">You missed the battle!</h2>
+          <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Battle window closed</h2>
           <p className="text-sm text-gray-500 mb-6">
-            {config.challenge} vs {opponentName} started {Math.floor(secondsLate / 60)} minutes ago.
+            {config.challenge} vs {opponentName} — the 1-hour join window has passed.
           </p>
           <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-4 w-full max-w-xs">
-            <p className="text-xs text-red-600 font-bold">Forfeited. Opponent wins.</p>
+            <p className="text-xs text-red-600 font-bold">No one joined in time. Battle expired.</p>
           </div>
           <button onClick={onBack} className="mt-8 font-bold text-blue-700 uppercase text-xs tracking-widest bg-white border-2 border-gray-200 px-6 py-3 rounded-xl shadow-sm active:scale-95 transition-all">
             Return to Arena
@@ -204,7 +204,7 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
             I&apos;m Here! Start Battle
           </button>
           <p className="text-[10px] text-gray-400 mt-4">
-            You have {Math.max(0, GRACE_PERIOD_SECONDS - secondsLate)}s to join before forfeit
+            You have {Math.floor(Math.max(0, GRACE_PERIOD_SECONDS - secondsLate) / 60)}m {Math.max(0, GRACE_PERIOD_SECONDS - secondsLate) % 60}s to join
           </p>
         </div>
         {showWithdrawConfirm && <WithdrawModal opponentName={opponentName} onCancel={() => setShowWithdrawConfirm(false)} onConfirm={confirmWithdraw} />}

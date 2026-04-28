@@ -802,29 +802,37 @@ export default function Arena({
           {sentInvites.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Your Sent Challenges</h3>
-              {sentInvites.map(inv => (
-                <div
-                  key={inv.id}
-                  onClick={() => {
-                    setActiveBattleId(inv.id);
-                    setActiveBattleConfig({
-                      opponent: inv.to,
-                      challenge: inv.challenge,
-                      target: CHALLENGE_TARGETS[inv.challenge] || 10,
-                      scheduledTime: inv.scheduledTime,
-                    });
-                    setScreen('battle');
-                  }}
-                  className="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
-                >
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-base">vs {inv.to}</h4>
-                    <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
-                    <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+              {sentInvites.map(inv => {
+                const WINDOW_MS = 3600000; // 1 hour window
+                const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
+                return (
+                  <div
+                    key={inv.id}
+                    onClick={() => {
+                      if (expired) return;
+                      setActiveBattleId(inv.id);
+                      setActiveBattleConfig({
+                        opponent: inv.to,
+                        challenge: inv.challenge,
+                        target: CHALLENGE_TARGETS[inv.challenge] || 10,
+                        scheduledTime: inv.scheduledTime,
+                      });
+                      setScreen('battle');
+                    }}
+                    className={`bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between ${expired ? 'opacity-50' : 'cursor-pointer active:scale-[0.98] transition-transform'}`}
+                  >
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-base">vs {inv.to}</h4>
+                      <p className="text-[11px] text-blue-700 font-bold uppercase tracking-wide mt-0.5">{inv.challenge}</p>
+                      <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                      {expired && <p className="text-[10px] text-red-400 font-bold mt-1">No one joined — expired</p>}
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${expired ? 'text-gray-400 bg-gray-50 border-gray-200' : 'text-yellow-600 bg-yellow-50 border-yellow-100'}`}>
+                      {expired ? 'Expired' : 'Pending'}
+                    </span>
                   </div>
-                  <span className="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">Pending</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
           {pendingInvites.length > 0 && (
