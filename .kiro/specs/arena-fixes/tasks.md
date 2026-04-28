@@ -1,0 +1,45 @@
+# Implementation Plan: Arena Fixes & Features
+
+## Tasks
+
+- [x] 1. Update types and db.ts foundations
+- [x] 2. Extract and fix core filter logic
+  - [x] 2.1 Create lib/filters.ts with pure filterBattles function
+- [x] 3. Fix Dashboard — public battles, search, filters, reaction counts, rejoin
+  - [x] 3.1 Fix generateDummyBattles to set isPublic true on all 15 battles
+  - [x] 3.2 Update Dashboard to use filterBattles from lib/filters.ts
+  - [x] 3.3 Fix reaction counts display
+  - [x] 3.4 Add Rejoin button to battle cards
+- [x] 4. Fix logout
+- [x] 5. Fix Arena — scheduled time picker, custom challenge, find-user from Supabase
+  - [x] 5.1 Replace schedule picker with datetime-local input
+  - [x] 5.2 Fix custom challenge input priority
+  - [x] 5.3 Fetch all users from Supabase and wire find-user dropdown
+- [x] 6. Fix Battle — withdraw confirmation, app-close forfeit, stats persistence
+  - [x] 6.1 Add visible Withdraw button
+  - [x] 6.2 Add confirmation modal before withdraw
+  - [x] 6.3 Add visibilitychange event listener for auto-forfeit
+- [x] 7. Fix points, bet deduction, and bet resolution timing
+  - [x] 7.1 Create lib/betLogic.ts with pure bet functions
+  - [x] 7.2 Disable bet button when points < 50
+  - [x] 7.3 Ensure resolveBattle only fires after winner declared
+- [x] 8. Fix streak, win, loss tracking
+  - [x] 8.1 Create lib/statsLogic.ts with updateStats pure function
+  - [x] 8.2 Call updateProfile after each battle outcome
+- [x] 9. Checkpoint
+- [x] 10. Build WhatsApp-style real-time chat
+  - [x] 10.1 Add auto-scroll to bottom in chat view
+  - [x] 10.2 Add Supabase Realtime subscription for chat
+  - [x] 10.3 Ensure message timestamps and sender names display correctly
+- [x] 11. Build LiveBattlePage component
+  - [x] 11.1 Create components/LiveBattlePage.tsx
+  - [x] 11.2 Add countdown timer for upcoming battles
+  - [x] 11.3 Add post-battle poll section
+  - [x] 11.4 Add Supabase Realtime subscription for live progress
+  - [x] 11.5 Wire LiveBattlePage into app/page.tsx
+- [x] 12. Build ReferralPage component
+  - [x] 12.1 Create components/ReferralPage.tsx
+  - [x] 12.2 Add referral code generation on signup
+  - [x] 12.3 Award 20 points on referral signup
+  - [x] 12.4 Add referral to BottomNav and wire into page.tsx
+- [x] 13. Final checkpoint
