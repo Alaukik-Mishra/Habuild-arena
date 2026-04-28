@@ -521,7 +521,22 @@ export default function Arena({
     const opponent = selUser || findQuery.trim();
     if (!challenge || !opponent) return;
     const target = CHALLENGE_TARGETS[challenge] || 10;
-    const scheduledTime = new Date(scheduleValue).getTime() || Date.now() + 60000;
+
+    // Compute scheduledTime fresh at submit time to avoid stale preset values
+    let scheduledTime: number;
+    if (schedulePreset === 'now') {
+      scheduledTime = Date.now();
+    } else if (schedulePreset === 'in1h') {
+      scheduledTime = Date.now() + 3600000;
+    } else if (schedulePreset === 'in2h') {
+      scheduledTime = Date.now() + 7200000;
+    } else if (schedulePreset === 'tomorrow') {
+      const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
+      scheduledTime = d.getTime();
+    } else {
+      scheduledTime = customSchedule ? new Date(customSchedule).getTime() : Date.now() + 60000;
+    }
+
     const newInvite: Invite = {
       id: crypto.randomUUID(),
       from: userName,
