@@ -65,54 +65,7 @@ const INITIAL_INVITES: Invite[] = [];
 
 const INITIAL_FRIEND_REQUESTS: FriendRequest[] = [];
 
-const INITIAL_CHAT_THREADS: ChatThread[] = [
-  {
-    id: 't1',
-    participants: ['You', 'Arjun'],
-    messages: [
-      { id: 'm1', sender: 'Arjun', text: 'You ready for tomorrow?', timestamp: _now - 3600000 },
-      { id: 'm2', sender: 'You', text: 'Always ready!', timestamp: _now - 3500000 },
-      { id: 'm3', sender: 'Arjun', text: 'Let\'s go 💪 I\'m doing 100 pushups', timestamp: _now - 3400000 },
-    ],
-  },
-  {
-    id: 't2',
-    participants: ['You', 'Priya'],
-    messages: [
-      { id: 'm4', sender: 'Priya', text: 'GG nice pushups!', timestamp: _now - 10800000 },
-      { id: 'm5', sender: 'You', text: 'Thanks! You were close too', timestamp: _now - 10700000 },
-      { id: 'm6', sender: 'Priya', text: 'Rematch tomorrow? 🔥', timestamp: _now - 10600000 },
-      { id: 'm7', sender: 'You', text: 'You\'re on!', timestamp: _now - 10500000 },
-    ],
-  },
-  {
-    id: 't3',
-    participants: ['You', 'Kunal'],
-    messages: [
-      { id: 'm8', sender: 'Kunal', text: 'Bro I challenged you to a plank battle', timestamp: _now - 7200000 },
-      { id: 'm9', sender: 'You', text: 'Saw it, accepting now', timestamp: _now - 7100000 },
-      { id: 'm10', sender: 'Kunal', text: 'Don\'t chicken out 😂', timestamp: _now - 7000000 },
-    ],
-  },
-  {
-    id: 't4',
-    participants: ['You', 'Rahul'],
-    messages: [
-      { id: 'm11', sender: 'Rahul', text: 'How many squats did you do today?', timestamp: _now - 86400000 },
-      { id: 'm12', sender: 'You', text: '150! New PR 🎉', timestamp: _now - 86300000 },
-      { id: 'm13', sender: 'Rahul', text: 'Beast mode activated', timestamp: _now - 86200000 },
-    ],
-  },
-  {
-    id: 't5',
-    participants: ['You', 'Neha'],
-    messages: [
-      { id: 'm14', sender: 'Neha', text: 'Hey! Want to join our group challenge?', timestamp: _now - 172800000 },
-      { id: 'm15', sender: 'You', text: 'What\'s the challenge?', timestamp: _now - 172700000 },
-      { id: 'm16', sender: 'Neha', text: '30 day plank streak 🏆', timestamp: _now - 172600000 },
-    ],
-  },
-];
+const INITIAL_CHAT_THREADS: ChatThread[] = [];
 
 const DEFAULT_ALL_USERS = ['Alex', 'Jordan', 'Leo', 'Sam', 'Priya', 'Kunal', 'Arjun', 'Rahul'];
 const CHALLENGES = ['10 Pushups', '50 Squats', '2 Min Plank', '1 Min Burpees', '100 Jumping Jacks', '30 Second Sprint'];

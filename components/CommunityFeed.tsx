@@ -68,14 +68,23 @@ export default function CommunityFeed({ user, points }: Props) {
       setPosts(fetched);
       setErrorBanner(false);
 
-      // Initialise poll vote counts from fetched posts
+      // Initialise poll vote counts from actual post data
       const newMap = new Map<string, number[]>();
       for (const post of fetched) {
         if (post.postType === 'poll' && post.content.pollOptions) {
+          // We don't have per-option counts from DB, keep zeros as placeholder
+          // Real counts come from castPostPollVote optimistic updates
           newMap.set(post.id, post.content.pollOptions.map(() => 0));
         }
       }
-      setPollVoteCounts(newMap);
+      setPollVoteCounts(prev => {
+        // Preserve any existing vote counts (from optimistic updates), only add new posts
+        const next = new Map(prev);
+        for (const [id, counts] of newMap) {
+          if (!next.has(id)) next.set(id, counts);
+        }
+        return next;
+      });
     } catch {
       setErrorBanner(true);
     } finally {

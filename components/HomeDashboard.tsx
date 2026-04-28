@@ -26,14 +26,13 @@ interface Props {
 function useCountdown(targetMs: number) {
   const [remaining, setRemaining] = useState(() => Math.max(0, targetMs - Date.now()));
   useEffect(() => {
-    if (remaining <= 0) return;
     const id = setInterval(() => {
       const r = Math.max(0, targetMs - Date.now());
       setRemaining(r);
       if (r <= 0) clearInterval(id);
     }, 1000);
     return () => clearInterval(id);
-  }, [targetMs, remaining]);
+  }, [targetMs]); // removed 'remaining' from deps — was causing interval restart every tick
   return remaining;
 }
 
@@ -68,8 +67,7 @@ export default function HomeDashboard({
   const [selectedProfile, setSelectedProfile] = useState<PlayerStats | null>(null);
   const [pendingBet, setPendingBet] = useState<{ battleId: string; player: string } | null>(null);
 
-  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now, user.name)
-    .filter(b => b.isPublic || b.p1.name === user.name || b.p2.name === user.name);
+  const filteredBattles = filterBattles(battles, battleFilter, searchQuery, now, user.name);
 
   const isParticipant = (b: LiveBattle) => b.p1.name === user.name || b.p2.name === user.name;
 
