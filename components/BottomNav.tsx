@@ -1,13 +1,14 @@
-import React from 'react';
 import { Home, Swords, Trophy, MessageSquare, User } from 'lucide-react';
 import { AppScreen } from '../types';
 
 interface Props {
   current: AppScreen;
   onNavigate: (s: AppScreen) => void;
+  unreadNotificationCount?: number;
+  onNotificationsClick?: () => void;
 }
 
-export default function BottomNav({ current, onNavigate }: Props) {
+export default function BottomNav({ current, onNavigate, unreadNotificationCount, onNotificationsClick }: Props) {
   const items = [
     { screen: 'dashboard' as AppScreen, icon: Home, label: 'HOME' },
     { screen: 'arena' as AppScreen, icon: Swords, label: 'ARENA' },
@@ -21,7 +22,7 @@ export default function BottomNav({ current, onNavigate }: Props) {
       {items.map(({ screen, icon: Icon, label }) => (
         <button
           key={screen}
-          onClick={() => onNavigate(screen)}
+          onClick={() => screen === 'dashboard' && unreadNotificationCount && onNotificationsClick ? onNotificationsClick() : onNavigate(screen)}
           className={`flex flex-col items-center transition-colors group ${current === screen ? 'text-blue-700' : 'text-gray-400 hover:text-gray-800'}`}
         >
           <div className="relative">
@@ -32,6 +33,11 @@ export default function BottomNav({ current, onNavigate }: Props) {
               className={`w-6 h-6 mb-1 transition-transform relative z-10 ${current === screen ? 'scale-110' : 'group-hover:-translate-y-1'}`}
               strokeWidth={current === screen ? 2.5 : 2}
             />
+            {screen === 'dashboard' && unreadNotificationCount && unreadNotificationCount > 0 ? (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full z-20">
+                {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
+              </span>
+            ) : null}
           </div>
           <span className="text-[10px] font-bold tracking-wider">{label}</span>
         </button>

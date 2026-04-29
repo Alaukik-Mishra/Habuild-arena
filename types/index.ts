@@ -1,5 +1,5 @@
 // types/index.ts
-export type AppScreen = 'dashboard' | 'arena' | 'battle' | 'profile' | 'leaderboard' | 'live' | 'referral' | 'community';
+export type AppScreen = 'dashboard' | 'arena' | 'battle' | 'profile' | 'leaderboard' | 'live' | 'referral' | 'community' | 'notifications' | 'battle_request' | 'waiting';
 
 export interface UserProfile {
   name: string;
@@ -26,7 +26,7 @@ export interface Comment {
 
 export type Reaction = Record<string, string[]>;
 
-export type BattleStatus = 'upcoming' | 'live' | 'completed' | 'forfeited';
+export type BattleStatus = 'pending' | 'active' | 'upcoming' | 'live' | 'completed' | 'forfeited';
 
 export interface LiveBattle {
   id: string;
@@ -89,6 +89,7 @@ export interface Invite {
   challenge: string;
   scheduledTime: number;
   status: InviteStatus;
+  battleStatus?: BattleInviteStatus;
   isPublic: boolean;
   timestamp: number;
 }
@@ -204,5 +205,49 @@ export interface PostComment {
   postId: string;
   authorName: string;
   text: string;
+  createdAt: number;
+}
+
+// Battle Request Notification Types
+export type BattleInviteStatus =
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'REJECTED'
+  | 'CHECKED_IN_OPPONENT'
+  | 'LIVE'
+  | 'ARCHIVED';
+
+export interface BattleInvite {
+  id: string;
+  from: string;                        // challenger name
+  to: string;                          // opponent name
+  challenge: string;
+  scheduledTime: number;
+  status: BattleInviteStatus;
+  isPublic: boolean;
+  timestamp: number;
+  checkinDeadline?: number;            // ms timestamp, set on ACCEPTED
+  challengerCheckedIn: boolean;
+  opponentCheckedIn: boolean;
+}
+
+export type NotificationType =
+  | 'battle_request'
+  | 'battle_accepted'
+  | 'battle_declined'
+  | 'join_reminder'
+  | 'default_win';
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  inviteId?: string;
+  payload: {
+    challengerName?: string;
+    opponentName?: string;
+    challengeName?: string;
+  };
+  read: boolean;
   createdAt: number;
 }

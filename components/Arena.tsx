@@ -1,8 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Check, X, Send, Search, Globe, Lock, ArrowLeft, UserPlus, Clock, ChevronDown, Coins, Zap, MessageCircle, Link as LinkIcon, Crosshair, Flame, Trophy, RotateCcw } from 'lucide-react';
-import { AppScreen, Invite, FriendRequest, ChatThread, UserProfile, LiveBattle, PlayerStats } from '../types';
-import { subscribeToChat, updateInviteStatus, createBattle } from '../lib/db';
+import { AppScreen, Invite, FriendRequest, ChatThread, UserProfile, LiveBattle, PlayerStats, BattleInvite, BattleInviteStatus } from '../types';
+import { subscribeToChat, acceptBattleRequest, rejectBattleRequest, createBattleRequest } from '../lib/db';
 import { filterBattles, BattleFilter } from '../lib/filters';
+import { BET_AMOUNT, validateBet } from '../lib/betLogic';
+import SentRequestsTab from './SentRequestsTab';
+
+function Spinner() {
+  return (
+    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    </svg>
+  );
+}
 
 // ─── BattlesSection ──────────────────────────────────────────────────────────
 
@@ -57,14 +68,26 @@ export function BattlesSection({
     }));
   };
 
+  const [betError, setBetError] = useState<string | null>(null);
   const confirmBet = () => {
     if (!pendingBet) return;
     const { battleId, player } = pendingBet;
-    if (bets[battleId]) return;
-    if (points >= 50) {
-      setPoints(p => p - 50);
-      setBets(prev => ({ ...prev, [battleId]: player }));
+    if (bets[battleId]) { setPendingBet(null); return; }
+    // Input sanitisation — reject NaN/0/negative amounts and insufficient balances
+    // before mutating state. Previously this used a bare `points >= 50` guard
+    // which silently no-op'd on edge cases (NaN points, missing battle, etc.).
+    const validation = validateBet(points, BET_AMOUNT);
+    if (!validation.ok) {
+      setBetError(
+        validation.error === 'INSUFFICIENT_BALANCE'
+          ? `You need at least ${BET_AMOUNT} coins to place this bet.`
+          : 'Could not place this bet — invalid amount or balance.'
+      );
+      return;
     }
+    setBetError(null);
+    setPoints(p => p - BET_AMOUNT);
+    setBets(prev => ({ ...prev, [battleId]: player }));
     setPendingBet(null);
   };
 
@@ -168,7 +191,12 @@ export function BattlesSection({
         const isUpcoming = sched && now < sched;
         const isCompleted = !!battle.winner || battle.status === 'completed' || battle.status === 'forfeited';
         const amParticipant = isParticipant(battle);
-        const canRejoin = amParticipant && !isCompleted && activeBattleId !== battle.id;
+        // "Rejoin" must only show for genuinely-active battles (status === 'live'
+        // AND not already in this client's active battle session). Previously
+        // this also rendered for upcoming / pre-checkin battles, which is what
+        // produced the "stuck on Rejoin" loop the user reported.
+        const isLive = battle.status === 'live' && !isCompleted;
+        const canRejoin = amParticipant && isLive && activeBattleId !== battle.id;
 
         return (
           <div
@@ -374,15 +402,20 @@ export function BattlesSection({
 
       {pendingBet && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPendingBet(null)} />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setPendingBet(null); setBetError(null); }} />
           <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 relative z-10 shadow-2xl">
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-2">Confirm Bet</h3>
             <p className="text-sm text-gray-600 mb-2 leading-relaxed">
-              Bet <strong className="text-yellow-600">50 Coins</strong> on <strong className="text-blue-700">{pendingBet.player}</strong>?
+              Bet <strong className="text-yellow-600">{BET_AMOUNT} Coins</strong> on <strong className="text-blue-700">{pendingBet.player}</strong>?
             </p>
-            <p className="text-xs text-gray-400 mb-8">Result is paid out only after the battle ends.</p>
+            <p className="text-xs text-gray-400 mb-4">Result is paid out only after the battle ends.</p>
+            {betError && (
+              <div role="alert" className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+                {betError}
+              </div>
+            )}
             <div className="flex space-x-3">
-              <button onClick={() => setPendingBet(null)} className="flex-1 py-3.5 bg-gray-50 text-gray-600 font-bold text-xs uppercase tracking-wider rounded-xl border border-gray-200">Cancel</button>
+              <button onClick={() => { setPendingBet(null); setBetError(null); }} className="flex-1 py-3.5 bg-gray-50 text-gray-600 font-bold text-xs uppercase tracking-wider rounded-xl border border-gray-200">Cancel</button>
               <button onClick={confirmBet} className="flex-1 py-3.5 bg-yellow-400 text-yellow-900 font-bold text-xs uppercase tracking-wider rounded-xl shadow-[0_4px_0_#ca8a04] active:shadow-none active:translate-y-[4px] transition-all">Place Bet</button>
             </div>
           </div>
@@ -432,20 +465,13 @@ interface Props {
   setCurrentScreen: React.Dispatch<React.SetStateAction<AppScreen>>;
   selectedBattleId: string | null;
   setSelectedBattleId: React.Dispatch<React.SetStateAction<string | null>>;
+  onNavigateToBattle?: (inviteId: string) => void;
 }
 
 const CHALLENGE_TARGETS: Record<string, number> = {
   '10 Pushups': 10, '50 Squats': 50, '2 Min Plank': 120,
   '1 Min Burpees': 30, '100 Jumping Jacks': 100, '30 Second Sprint': 1,
 };
-
-function fmtTime(ts: number): string {
-  const d = Math.floor((Date.now() - ts) / 1000);
-  if (d < 60) return 'Just now';
-  if (d < 3600) return `${Math.floor(d / 60)}m ago`;
-  if (d < 86400) return `${Math.floor(d / 3600)}h ago`;
-  return `${Math.floor(d / 86400)}d ago`;
-}
 
 export default function Arena({
   setScreen, setActiveBattleConfig, setActiveBattleId,
@@ -456,9 +482,9 @@ export default function Arena({
   user, points, setPoints, battles, setBattles, bets, setBets, now,
   searchQuery, setSearchQuery, battleFilter, setBattleFilter,
   activeBattleId, setBattlesActiveBattleId, setCurrentScreen,
-  selectedBattleId, setSelectedBattleId,
+  selectedBattleId, setSelectedBattleId, onNavigateToBattle,
 }: Props) {
-  const [tab, setTab] = useState<'challenges'|'chat'|'friends'>('challenges');
+  const [tab, setTab] = useState<'challenges'|'chat'|'friends'|'sent'>('challenges');
   const [challengeFilter, setChallengeFilter] = useState<'all'|'live'|'pending'|'expired'>('all');
   const [showCreate, setShowCreate] = useState(false);
   const [selChallenge, setSelChallenge] = useState(challenges[0]);
@@ -470,17 +496,39 @@ export default function Arena({
   const [customSchedule, setCustomSchedule] = useState('');
   // Derived: the actual scheduled time string to use
   const scheduleValue = (() => {
-    if (schedulePreset === 'now') { const d = new Date(); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
-    if (schedulePreset === 'in1h') { const d = new Date(Date.now()+3600000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
-    if (schedulePreset === 'in2h') { const d = new Date(Date.now()+7200000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
-    if (schedulePreset === 'tomorrow') { const d = new Date(); d.setDate(d.getDate()+1); d.setHours(9,0,0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'now') { const d = new Date(now); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'in1h') { const d = new Date(now+3600000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'in2h') { const d = new Date(now+7200000); d.setSeconds(0,0); return d.toISOString().slice(0,16); }
+    if (schedulePreset === 'tomorrow') { const d = new Date(now); d.setDate(d.getDate()+1); d.setHours(9,0,0,0); return d.toISOString().slice(0,16); }
     return customSchedule;
   })();
   const [activeChat, setActiveChat] = useState<string|null>(null);
   const [chatInput, setChatInput] = useState('');
   const [friendTab, setFriendTab] = useState<'received'|'sent'>('received');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserResults, setShowUserResults] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const userSearchRef = useRef<HTMLDivElement>(null);
+
+  // Close user search dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userSearchRef.current && !userSearchRef.current.contains(e.target as Node)) {
+        setShowUserResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  function fmtTime(ts: number): string {
+    const d = Math.floor((now - ts) / 1000);
+    if (d < 60) return 'Just now';
+    if (d < 3600) return `${Math.floor(d / 60)}m ago`;
+    if (d < 86400) return `${Math.floor(d / 3600)}h ago`;
+    return `${Math.floor(d / 86400)}d ago`;
+  }
 
   const pendingInvites = invites.filter(i => i.to === userName && i.status === 'pending');
   const sentInvites = invites.filter(i => i.from === userName && i.status === 'pending');
@@ -505,62 +553,82 @@ export default function Arena({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat, chatThreads]);
 
+  // Track in-flight invite IDs to prevent duplicate submissions
+  const [pendingInviteAction, setPendingInviteAction] = useState<Record<string, 'accept' | 'reject'>>({});
+
   const handleAcceptInvite = async (id: string) => {
+    // Guard: already in-flight or invite is no longer pending
+    if (pendingInviteAction[id]) return;
     const inv = invites.find(i => i.id === id);
-    if (!inv) return;
+    if (!inv || inv.status !== 'pending') return;
+
+    // Optimistic update — disable button synchronously before any async call
+    setPendingInviteAction(prev => ({ ...prev, [id]: 'accept' }));
+
+    const result = await acceptBattleRequest(id);
+    if (result && 'error' in result) {
+      // Roll back on error
+      setPendingInviteAction(prev => { const next = { ...prev }; delete next[id]; return next; });
+      if (result.error === 'INVITE_NOT_PENDING') {
+        // Invite was already handled — remove it from local state
+        setInvites(prev => prev.filter(i => i.id !== id));
+      }
+      return;
+    }
+
     setInvites(prev => prev.map(i => i.id === id ? { ...i, status: 'accepted' as const } : i));
-    // Create the battle now that opponent accepted
-    const target = CHALLENGE_TARGETS[inv.challenge] || 10;
-    const newBattle = {
-      id: inv.id,
-      p1: { name: inv.from, wins: 0, streak: 0 },
-      p2: { name: inv.to, wins: 0, streak: 0 },
-      challenge: inv.challenge,
-      pool: 0,
-      p1Reps: 0,
-      p2Reps: 0,
-      target,
-      timeLeft: '00:00',
-      comments: [] as import('../types').Comment[],
-      reactions: {} as import('../types').Reaction,
-      status: 'upcoming' as const,
-      isPublic: inv.isPublic,
-      bettingOpen: true,
-      scheduledTime: inv.scheduledTime,
-    };
-    setBattles(prev => [newBattle, ...prev]);
-    setActiveBattleId(id);
-    setActiveBattleConfig({ opponent: inv.from, challenge: inv.challenge, target, scheduledTime: inv.scheduledTime });
-    try { await updateInviteStatus(id, 'accepted'); } catch (e) { console.error(e); }
-    try { await createBattle(newBattle); } catch (e) { console.error(e); }
-    setScreen('battle');
+    setPendingInviteAction(prev => { const next = { ...prev }; delete next[id]; return next; });
+    onNavigateToBattle?.(id);
   };
 
   const handleRejectInvite = async (id: string) => {
+    if (pendingInviteAction[id]) return;
+    const inv = invites.find(i => i.id === id);
+    if (!inv || inv.status !== 'pending') return;
+
+    setPendingInviteAction(prev => ({ ...prev, [id]: 'reject' }));
+
+    const result = await rejectBattleRequest(id);
+    if (result && 'error' in result) {
+      setPendingInviteAction(prev => { const next = { ...prev }; delete next[id]; return next; });
+      if (result.error === 'INVITE_NOT_PENDING') {
+        setInvites(prev => prev.filter(i => i.id !== id));
+      }
+      return;
+    }
+
     setInvites(prev => prev.map(i => i.id === id ? { ...i, status: 'rejected' as const } : i));
-    try { await updateInviteStatus(id, 'rejected'); } catch (e) { console.error(e); }
+    setPendingInviteAction(prev => { const next = { ...prev }; delete next[id]; return next; });
   };
 
-  const handleCreate = () => {
-    const challenge = customChallenge.trim() || selChallenge;
-    const opponent = selUser || findQuery.trim();
-    if (!challenge || !opponent) return;
-    const target = CHALLENGE_TARGETS[challenge] || 10;
+  const handleCreate = async () => {
+    const opponent = (selUser || findQuery).trim();
+    if (!opponent) { setCreateError('Please select or search for an opponent.'); return; }
+    if (opponent === userName) { setCreateError('You cannot challenge yourself!'); return; }
+    const challenge = (customChallenge.trim() || selChallenge).trim();
+    if (!challenge) { setCreateError('Please pick or type a challenge.'); return; }
 
-    // Compute scheduledTime fresh at submit time to avoid stale preset values
-    let scheduledTime: number;
-    if (schedulePreset === 'now') {
-      scheduledTime = Date.now();
-    } else if (schedulePreset === 'in1h') {
-      scheduledTime = Date.now() + 3600000;
-    } else if (schedulePreset === 'in2h') {
-      scheduledTime = Date.now() + 7200000;
-    } else if (schedulePreset === 'tomorrow') {
-      const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
-      scheduledTime = d.getTime();
-    } else {
-      scheduledTime = customSchedule ? new Date(customSchedule).getTime() : Date.now() + 60000;
+    // Normalize schedule to integer seconds first (state-machine canonical unit),
+    // then derive milliseconds only for legacy UI state fields.
+    const computeScheduledTimeSeconds = (): number | null => {
+      if (schedulePreset === 'now') return Math.trunc(now / 1000);
+      if (schedulePreset === 'in1h') return Math.trunc((now + 3_600_000) / 1000);
+      if (schedulePreset === 'in2h') return Math.trunc((now + 7_200_000) / 1000);
+      if (schedulePreset === 'tomorrow') {
+        const d = new Date(now); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
+        return Math.trunc(d.getTime() / 1000);
+      }
+      // Custom path
+      if (!customSchedule) return null;
+      const parsed = new Date(customSchedule).getTime();
+      return Number.isFinite(parsed) && parsed > 0 ? Math.trunc(parsed / 1000) : null;
+    };
+    const scheduledTimeSeconds = computeScheduledTimeSeconds();
+    if (scheduledTimeSeconds === null || !Number.isInteger(scheduledTimeSeconds) || scheduledTimeSeconds <= 0) {
+      setCreateError('Please pick a valid start time.');
+      return;
     }
+    const scheduledTime = scheduledTimeSeconds * 1000;
 
     const newInvite: Invite = {
       id: crypto.randomUUID(),
@@ -572,8 +640,30 @@ export default function Arena({
       isPublic,
       timestamp: Date.now(),
     };
-    onCreateInvite(newInvite);
+    const result = await createBattleRequest(userName, opponent, challenge, isPublic, scheduledTimeSeconds);
+    if (typeof result === 'string') {
+      const inviteWithId: Invite = { ...newInvite, id: result };
+      onCreateInvite(inviteWithId);
+    } else if (result && 'error' in result) {
+      if (result.error === 'DUPLICATE_REQUEST') {
+        setCreateError('You already have a pending challenge against this opponent for this challenge.');
+        return;
+      }
+      if (result.error === 'INVALID_INPUT') {
+        setCreateError('Some fields are missing or invalid. Please review and retry.');
+        return;
+      }
+      setCreateError('Could not create challenge. Please try again.');
+      return;
+    }
     setShowCreate(false);
+    setSelUser('');
+    setFindQuery('');
+    setShowUserResults(false);
+    setCreateError(null);
+    setCustomChallenge('');
+    setSchedulePreset('now');
+    setCustomSchedule('');
     // Don't navigate to battle — wait for opponent to accept
   };
 
@@ -660,7 +750,7 @@ export default function Arena({
     return (
       <div className="flex-1 overflow-y-auto px-5 pt-8 pb-28 scrollbar-hide bg-[#FDFCF7]">
         <div className="flex items-center mb-6">
-          <button onClick={() => setShowCreate(false)} className="mr-3 text-gray-400 hover:text-gray-900"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => { setShowCreate(false); setSelUser(''); setFindQuery(''); setShowUserResults(false); setCreateError(null); setCustomChallenge(''); setSchedulePreset('now'); setCustomSchedule(''); }} className="mr-3 text-gray-400 hover:text-gray-900"><ArrowLeft className="w-5 h-5" /></button>
           <h2 className="text-2xl font-serif font-bold text-gray-900">Create Challenge</h2>
         </div>
         <div className="space-y-5">
@@ -696,33 +786,34 @@ export default function Arena({
           <div>
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Opponent</label>
             {friends.length > 0 && (
-              <select value={selUser} onChange={e => { setSelUser(e.target.value); setFindQuery(''); }} className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-900 mb-2 outline-none">
+              <select value={selUser} onChange={e => { setSelUser(e.target.value); setFindQuery(''); setShowUserResults(false); }} className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-900 mb-2 outline-none">
                 <option value="">Select friend...</option>
                 {friends.map(f => <option key={f} value={f}>{f}</option>)}
               </select>
             )}
-            <div className="relative">
+            <div className="relative" ref={userSearchRef}>
               <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
                 <Search className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                 <input
                   type="text"
                   value={findQuery}
-                  onChange={e => { setFindQuery(e.target.value); setSelUser(''); }}
+                  onChange={e => { setFindQuery(e.target.value); setSelUser(''); setShowUserResults(true); }}
+                  onFocus={() => setShowUserResults(true)}
                   placeholder="Search any user..."
                   className="flex-1 bg-transparent text-sm outline-none"
                 />
               </div>
-              {findQuery && filteredUsers.length > 0 && (
+              {showUserResults && findQuery && filteredUsers.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto">
-                  {filteredUsers.map(u => (
-                    <button key={u} onClick={() => { setFindQuery(u); setSelUser(''); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center space-x-2">
+                  {filteredUsers.map((u, idx) => (
+                    <button key={`${u}-${idx}`} onClick={() => { setFindQuery(u); setSelUser(''); setShowUserResults(false); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center space-x-2">
                       <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-xs">{u[0]}</div>
                       <span>{u}</span>
                     </button>
                   ))}
                 </div>
               )}
-              {findQuery && filteredUsers.length === 0 && (
+              {showUserResults && findQuery && filteredUsers.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-lg z-20 px-4 py-3 text-sm text-gray-400">No users found</div>
               )}
             </div>
@@ -795,6 +886,12 @@ export default function Arena({
             </p>
           </div>
 
+          {createError && (
+            <div className="w-full rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 text-center">
+              {createError}
+            </div>
+          )}
+
           <button
             onClick={handleCreate}
             disabled={(!selUser && !findQuery.trim()) || (!selChallenge && !customChallenge.trim())}
@@ -815,7 +912,7 @@ export default function Arena({
       </div>
 
       <div className="bg-gray-100 p-1 rounded-xl flex mb-6 shadow-inner">
-        {(['challenges', 'friends', 'chat'] as const).map(t => (
+        {(['challenges', 'friends', 'chat', 'sent'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all capitalize ${tab === t ? 'bg-white shadow text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}>{t}</button>
         ))}
       </div>
@@ -843,11 +940,13 @@ export default function Arena({
             const WINDOW_MS = 3600000;
             const allSent = invites.filter(i => i.from === userName);
             const filtered = allSent.filter(inv => {
+              const machine = inv.battleStatus ?? (inv.status === 'pending' ? 'PENDING' : inv.status === 'rejected' ? 'REJECTED' : 'ACCEPTED');
               const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
-              const isLive = !expired && Date.now() >= inv.scheduledTime;
+              const isLive = machine === 'LIVE';
+              const isPending = machine === 'PENDING';
               if (challengeFilter === 'expired') return expired || inv.status === 'rejected';
-              if (challengeFilter === 'live') return isLive && inv.status !== 'rejected';
-              if (challengeFilter === 'pending') return !expired && !isLive && inv.status === 'pending';
+              if (challengeFilter === 'live') return !expired && isLive && machine !== 'REJECTED';
+              if (challengeFilter === 'pending') return !expired && isPending;
               return true;
             });
             if (filtered.length === 0) return null;
@@ -856,14 +955,20 @@ export default function Arena({
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Your Sent Challenges</h3>
               {filtered.map(inv => {
                 const expired = Date.now() > inv.scheduledTime + WINDOW_MS;
-                const isRejected = inv.status === 'rejected';
-                const isAccepted = inv.status === 'accepted';
+                const machine = inv.battleStatus ?? (inv.status === 'pending' ? 'PENDING' : inv.status === 'rejected' ? 'REJECTED' : 'ACCEPTED');
+                const isRejected = machine === 'REJECTED' || inv.status === 'rejected';
+                const isPending = machine === 'PENDING';
+                const isLive = machine === 'LIVE';
                 return (
                   <div
                     key={inv.id}
                     onClick={() => {
                       if (expired || isRejected) return;
-                      if (!isAccepted) return; // can't enter battle until accepted
+                      if (isPending) return;
+                      if (!isLive) {
+                        onNavigateToBattle?.(inv.id);
+                        return;
+                      }
                       setActiveBattleId(inv.id);
                       setActiveBattleConfig({
                         opponent: inv.to,
@@ -886,12 +991,12 @@ export default function Arena({
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${
                       isRejected ? 'text-red-600 bg-red-50 border-red-200' :
-                      isAccepted ? 'text-green-600 bg-green-50 border-green-200' :
+                      isLive ? 'text-green-600 bg-green-50 border-green-200' :
                       expired ? 'text-gray-400 bg-gray-50 border-gray-200' :
-                      Date.now() >= inv.scheduledTime ? 'text-red-600 bg-red-50 border-red-100' :
+                      !isPending ? 'text-blue-600 bg-blue-50 border-blue-100' :
                       'text-yellow-600 bg-yellow-50 border-yellow-100'
                     }`}>
-                      {isRejected ? 'Rejected' : isAccepted ? '✅ Accepted' : expired ? 'Expired' : Date.now() >= inv.scheduledTime ? '🔴 Live' : 'Pending'}
+                      {isRejected ? 'Rejected' : isLive ? 'Enter Arena' : expired ? 'Expired' : !isPending ? 'Start Battle' : 'Pending'}
                     </span>
                   </div>
                 );
@@ -910,8 +1015,20 @@ export default function Arena({
                     <p className="text-[10px] text-gray-400 mt-1 flex items-center"><Clock className="w-3 h-3 mr-1" />{new Date(inv.scheduledTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                   <div className="flex space-x-3">
-                    <button onClick={() => handleRejectInvite(inv.id)} className="w-11 h-11 bg-red-50 rounded-xl flex items-center justify-center text-red-500 border-2 border-red-100 active:bg-red-100"><X className="w-5 h-5" /></button>
-                    <button onClick={() => handleAcceptInvite(inv.id)} className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center text-green-600 border-2 border-green-100 active:bg-green-100"><Check className="w-5 h-5" /></button>
+                    <button
+                      onClick={() => handleRejectInvite(inv.id)}
+                      disabled={!!pendingInviteAction[inv.id]}
+                      className="w-11 h-11 bg-red-50 rounded-xl flex items-center justify-center text-red-500 border-2 border-red-100 active:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {pendingInviteAction[inv.id] === 'reject' ? <Spinner /> : <X className="w-5 h-5" />}
+                    </button>
+                    <button
+                      onClick={() => handleAcceptInvite(inv.id)}
+                      disabled={!!pendingInviteAction[inv.id]}
+                      className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center text-green-600 border-2 border-green-100 active:bg-green-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {pendingInviteAction[inv.id] === 'accept' ? <Spinner /> : <Check className="w-5 h-5" />}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -1014,6 +1131,16 @@ export default function Arena({
             );
           })}
         </div>
+      )}
+
+      {tab === 'sent' && (
+        <SentRequestsTab
+          userName={userName}
+          invites={invites as unknown as BattleInvite[]}
+          onInviteStatusChange={(id, status) => {
+            setInvites(prev => prev.map(i => i.id === id ? { ...i, status: status.toLowerCase() as Invite['status'] } : i));
+          }}
+        />
       )}
 
     </div>

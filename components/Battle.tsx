@@ -46,6 +46,14 @@ export default function Battle({ onBack, config, userName, onWithdraw, activeBat
   const secondsLate = scheduledPassed ? Math.floor((nowMs - config.scheduledTime) / 1000) : 0;
   const isLate = scheduledPassed && secondsLate > GRACE_PERIOD_SECONDS && gameState === 'waiting';
 
+  // Single-action handshake: once battle is accepted and the player is routed
+  // here, auto-enter gameplay without a second "Start Battle" tap.
+  useEffect(() => {
+    if (scheduledPassed && gameState === 'waiting') {
+      setGameState('playing');
+    }
+  }, [scheduledPassed, gameState]);
+
   // Auto-forfeit when user leaves/closes app
   useEffect(() => {
     if (gameState !== 'playing') return;

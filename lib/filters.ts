@@ -10,6 +10,9 @@ export function filterBattles(
   userName?: string
 ): LiveBattle[] {
   return battles.filter(battle => {
+    // Pending offers should not appear in public battle discovery.
+    if (battle.status === 'pending') return false;
+
     // Hide private battles unless the user is a participant
     if (!battle.isPublic) {
       if (!userName) return false;
@@ -41,6 +44,7 @@ export function matchesFilter(
   const isLive =
     !isCompleted &&
     (battle.status === 'live' ||
+      battle.status === 'active' ||
       (battle.scheduledTime !== undefined && battle.scheduledTime <= now));
   const isUpcoming =
     !isCompleted &&

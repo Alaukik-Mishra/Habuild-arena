@@ -84,9 +84,9 @@ describe('PollOptions – voted state renders result bars with correct percentag
   });
 
   it('rounds percentages to nearest integer', () => {
-    // 1/3 each → rounds to 33%
+    // Largest-remainder policy keeps sum at 100%
     const pcts = calculatePollPercentages([1, 1, 1]);
-    expect(pcts).toEqual([33, 33, 33]);
+    expect(pcts).toEqual([34, 33, 33]);
   });
 });
 
